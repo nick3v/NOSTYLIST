@@ -1,6 +1,6 @@
+import mongo_connection
 def main():
-    # Your code here
-    print("Hello, World!")
+    pass
     
 if __name__ == "__main__":
     main()
