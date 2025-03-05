@@ -13,6 +13,6 @@ collection = mongo_connection.db["users"]
 
 # Make sure that the internal data (username, password, etc.) cannot be changed or accessed (needs to be secure)
 
-# Insert the data into the users collection
+# Insert the data into the users collection and obtain an inserted ID
 
 # inserted_id = collection.insert_one(user1).inserted_id
