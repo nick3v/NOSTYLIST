@@ -4,7 +4,7 @@
 1. Clone the repository.
 2. Install dependencies (pymongo) in the NOSTYLIST/src directory:
    ```bash
-   pip install -r requirements.txt
+   pip install -r src/requirements.txt
 
 ## MongoDB Atlas and Pymongo Documentation
 https://www.mongodb.com/docs/atlas/getting-started/
