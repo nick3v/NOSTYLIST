@@ -8,5 +8,5 @@ connection_string = "mongodb+srv://alejandrovelez:Eggface1@cluster0.snymu.mongod
 # Create a client and connect to database
 client = MongoClient(connection_string)
 
-# Access NOSTYLIST db
+# Access NOSTYLIST db - make sure you call the db using mongo_connection.db when importing this file
 db = client["NOSTYLIST"]

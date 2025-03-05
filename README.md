@@ -2,7 +2,7 @@
 ## Setup Instructions
 
 1. Clone the repository.
-2. Install dependencies (pymongo) using:
+2. Install dependencies (pymongo) in the NOSTYLIST/src directory:
    ```bash
    pip install -r requirements.txt
 
