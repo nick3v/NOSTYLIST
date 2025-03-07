@@ -61,3 +61,43 @@ def create_user(username, email, password):
 # Insert the data into the users collection and obtain an inserted ID
 
 # inserted_id = collection.insert_one(user1).inserted_id
+
+def authenticate_user(username, password):
+    """
+    Authenticate a user based on username and password. This function verifies if the provided
+    username exists in the database and if the password matches the stored hashed password.
+    
+    It returns a user ID on successful authentication to allow the application to identify 
+    the specific user for subsequent operations like session management.
+    
+    Args:
+        username (str): User's username
+        password (str): User's password to verify
+        
+    Returns:
+        dict: Result containing:
+            - success (bool): Whether authentication was successful
+            - user_id (str): MongoDB document ID of the authenticated user (on success)
+            - message (str): Error message (on failure)
+    """
+    # Example usage:
+    # result = authenticate_user("JordanCarter29", "I_AM_NOT_DROPPING")
+    
+    # print(result)
+    # Validate input data
+    if not username or not password:
+        return {"success": False, "message": "Username and password are required"}
+    
+    # Find user by username
+    user = collection.find_one({"username": username})
+    
+    # Check if user exists and password is correct using secure hash verification
+    if user and pbkdf2_sha256.verify(password, user["password"]):
+        # Return the MongoDB document ID to identify this specific user
+        # This ID can be used to look up user data or manage sessions
+        return {"success": True, "user_id": str(user["_id"])}
+    
+    return {"success": False, "message": "Invalid username or password"}
+
+
+
