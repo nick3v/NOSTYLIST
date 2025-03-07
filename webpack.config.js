@@ -30,19 +30,15 @@ module.exports = {
     extensions: ['.js', '.jsx']
   },
   devServer: {
-    static: [
-      {
-        directory: path.join(__dirname, 'public'),
-        publicPath: '/'
-      },
-      {
-        directory: path.join(__dirname, 'dist'),
-        publicPath: '/'
-      }
-    ],
+    static: {
+      directory: path.join(__dirname, 'public'),
+    },
     port: 3000,
     open: true,
     hot: true,
-    historyApiFallback: true
+    historyApiFallback: true,
+    devMiddleware: {
+      publicPath: '/'
+    }
   }
 };
