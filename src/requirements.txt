@@ -1,6 +1,3 @@
 pymongo
 passlib
-<<<<<<< HEAD
 flask
-=======
->>>>>>> origin/users/newfunctions
