@@ -9,4 +9,4 @@
 ## MongoDB Atlas and Pymongo Documentation
 https://www.mongodb.com/docs/atlas/getting-started/
 
-https://pymongo.readthedocs.io/en/stable/index.html
+[https://pymongo.readthedocs.io/en/stable/index.html](https://www.mongodb.com/docs/languages/python/pymongo-driver/current/read/retrieve/)
