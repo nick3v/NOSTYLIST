@@ -100,4 +100,30 @@ def authenticate_user(username, password):
     return {"success": False, "message": "Invalid username or password"}
 
 
+def get_user_by_id(user_id):
+    """
+    Retrieve a user document from the database based on their MongoDB document ID.
+    
+    Args:
+        user_id (str): MongoDB document ID of the user to retrieve
+        
+    Returns:
+        dict: Result containing:
+            - success (bool): Whether retrieval was successful
+            - user (dict): User document if found
+            - message (str): Error message (on failure)
+    """
+    try:
+        # Find user by ID
+        user = collection.find_one({"_id": ObjectId(user_id)})
+        
+        if user:
+            return {"success": True, "user": user}
+        else:
+            return {"success": False, "message": "User not found"}
+    except Exception as e:
+        return {"success": False, "message": f"Error retrieving user: {str(e)}"} 
 
+    # Example usage:
+    # result = get_user_by_id("66d563e1e5b58d4a8b75a33d")
+    # print(JordanCarter29)
