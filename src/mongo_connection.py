@@ -4,7 +4,7 @@ from pymongo import MongoClient
 
 
 # Connect to MongoDB Atlas
-connection_string = "mongodb+srv://alejandrovelez:Eggface1@cluster0.snymu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+connection_string = "mongodb+srv://alejandrovelez:YVES27@cluster0.snymu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
 # Create a client and connect to database
 client = MongoClient(connection_string)
