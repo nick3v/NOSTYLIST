@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import LoginFeature from './loginfeature';
 import './loginfeature.css';
 
-// Make sure the DOM is loaded before rendering
+// Make sure the DOM (Marco) is loaded before rendering
 document.addEventListener('DOMContentLoaded', () => {
   const rootElement = document.getElementById('root');
   if (rootElement) {
