@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './loginfeature.css';
+import { Link } from 'react-router-dom';
 
 const LoginFeature = () => {
   const [username, setUsername] = useState('');
@@ -117,7 +118,7 @@ const LoginFeature = () => {
                 </form>
 
                 <div className="login-footer">
-                  <p>Don't have an account? <a href="/signup">Sign up</a></p>
+                  <p>Don't have an account? <Link to="/signup">Sign up</Link></p>
                 </div>
               </div>
             </div>
