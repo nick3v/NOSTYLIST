@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NOSTYLIST</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #e1e1e1;
+      --primary-hover: #c6c5d6;
+      --bg-dark: #121212;
+      --card-bg: #1e1e1e;
+      --text-primary: #ffffff;
+      --text-secondary: #b3b3b3;
+      --error-color: #ff5252;
+      --input-bg: #2d2d2d;
+      --input-border: #3d3d3d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+    }
+
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(18, 18, 18, 0.95) 0%, rgba(30, 30, 30, 0.95) 100%);
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+
+    .login-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .login-header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, var(--primary-color), #9c92ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .login-header p {
+      color: var(--text-secondary);
+      font-size: 16px;
+    }
+
+    .login-form {
+      margin-bottom: 25px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      background-color: var(--input-bg);
+      color: var(--text-primary);
+      font-size: 16px;
+      transition: all 0.2s ease;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.2);
+    }
+
+    .form-group input::placeholder {
+      color: #6c6c6c;
+    }
+
+    .login-button {
+      width: 100%;
+      padding: 14px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      margin-top: 10px;
+    }
+
+    .login-button:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .login-button:disabled {
+      background-color: #4a4a4a;
+      cursor: not-allowed;
+    }
+
+    .error-message {
+      background-color: rgba(255, 82, 82, 0.1);
+      color: var(--error-color);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      text-align: center;
+      display: none;
+    }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 20px;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .login-footer a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .login-footer a:hover {
+      color: var(--primary-hover);
+      text-decoration: underline;
+    }
+
+    /* Animation for the login card */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h1>NOSTYLIST</h1>
+        <p>Sign in to continue</p>
+      </div>
+
+      <div id="error-message" class="error-message"></div>
+
+      <form id="login-form" class="login-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            required
+            autocomplete="username"
+            placeholder="Enter your username"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            required
+            autocomplete="current-password"
+            placeholder="Enter your password"
+          />
+        </div>
+
+        <button 
+          type="submit" 
+          class="login-button"
+          id="login-button"
+        >
+          Sign In
+        </button>
+      </form>
+
+      <div class="login-footer">
+        <p>Don't have an account? <a href="#">Sign up</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const loginForm = document.getElementById('login-form');
+      const errorMessage = document.getElementById('error-message');
+      const loginButton = document.getElementById('login-button');
+      
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        
+        if (!username || !password) {
+          showError('Username and password are required');
+          return;
+        }
+        
+        // Change button text and disable it
+        const originalButtonText = loginButton.textContent;
+        loginButton.textContent = 'Signing in...';
+        loginButton.disabled = true;
+        
+        try {
+          // Point to our local Flask API
+          const response = await fetch('http://localhost:5000/api/auth/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, password }),
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            // Store user ID in localStorage for session management
+            localStorage.setItem('userId', data.user_id);
+            // Redirect or update app state on successful login
+            window.location.href = '/dashboard';
+          } else {
+            showError(data.message || 'Login failed. Please check your credentials.');
+          }
+        } catch (err) {
+          showError('An error occurred. Please try again later.');
+          console.error('Login error:', err);
+        } finally {
+          // Reset button
+          loginButton.textContent = originalButtonText;
+          loginButton.disabled = false;
+        }
+      });
+      
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = 'block';
+        
+        // Hide error after 5 seconds
+        setTimeout(() => {
+          errorMessage.style.display = 'none';
+        }, 5000);
+      }
+    });
+  </script>
+</body>
+</html>
