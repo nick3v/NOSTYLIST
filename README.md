@@ -51,6 +51,11 @@ A modern authentication system with a dark-themed UI, built with Flask, MongoDB,
    ```bash
    npm install
    ```
+   1.1 May need to install "webpack" dependency using:
+
+    ```bash
+      -r src/npm_requirements.txt
+      ```
 
 2. Build the frontend:
    ```bash
