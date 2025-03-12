@@ -1,0 +1,219 @@
+/* Modern Dark Theme for NOSTYLIST Landing Page & Login */
+:root {
+  --primary-color: #29393a;
+  --primary-hover: #344647;
+  --bg-dark: #000000;
+  --card-bg: rgba(20, 20, 20, 0.85);
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --error-color: #ff5252;
+  --input-bg: #2d2d2d;
+  --input-border: #3d3d3d;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: url('./assets/images/nostyle.png') no-repeat center center fixed;
+  background-size: cover;
+  color: var(--text-primary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Landing Page */
+.landing-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  text-align: center;
+  transition: transform 1s ease-in-out;
+}
+
+.landing-title {
+  font-size: 92px; /* Keep the size large */
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, var(--primary-color), #5a5a5a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 30px;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.landing-title:hover {
+  transform: scale(1.01); /* Slightly enlarge */
+  opacity: 0.8; /* Make it slightly brighter */
+}
+
+
+.landing-subtitle {
+  font-size: 20px;
+  color: var(--text-secondary);
+  max-width: 700px;
+  margin-bottom: 50px;
+}
+
+.enter-button {
+  padding: 16px 32px;
+  background-color: var(--primary-color);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.enter-button:hover {
+  background-color: var(--primary-hover);
+}
+
+/* Hide login page initially */
+.login-container {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+}
+
+/* Sweeping transition effect */
+.show-login .landing-container {
+  transform: translateX(-100%);
+  opacity: 0;
+  transition: transform 1s ease-in-out, opacity 0.5s ease-in-out;
+}
+
+.show-login .login-container {
+  display: flex;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.show-login {
+  backdrop-filter: blur(4px);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 450px;
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  padding: 50px;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.login-header h1 {
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  background: linear-gradient(90deg, var(--primary-color), #ffffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.login-form {
+  margin-bottom: 25px;
+}
+
+.form-group {
+  margin-bottom: 35px; /* Increased spacing */
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px; /* Moved label up */
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.form-group input {
+  width: 100%;
+  padding: 16px 18px;
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  font-size: 18px;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.error-message {
+  background-color: rgba(255, 82, 82, 0.2);
+  color: var(--error-color);
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.login-button {
+  width: 100%;
+  padding: 16px;
+  background-color: var(--primary-color);
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 25px;
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+
+.login-footer a:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+/* Animation for transitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.landing-container, .login-card {
+  animation: fadeIn 1.0s ease-out forwards;
+}

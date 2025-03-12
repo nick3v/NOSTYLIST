@@ -19,7 +19,6 @@ class MongoDB:
     def getdb(self):
         return self.__db
 
-
 # Instantiate the MongoDB class
 mongoDB = MongoDB
 
