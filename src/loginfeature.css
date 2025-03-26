@@ -84,24 +84,63 @@ body {
   transition: transform 1s ease-in-out;
 }
 
+/* Glass shimmer animation */
+@keyframes glassShimmer {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Text glow animation for additional effect */
+@keyframes textGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.8));
+  }
+}
+
 .landing-title {
+  position: relative;
   font-size: 92px; /* Keep the size large */
   font-weight: 800;
   letter-spacing: 3px;
   text-transform: uppercase;
   background: linear-gradient(90deg, var(--primary-color), #5a5a5a);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 30px;
   cursor: pointer;
-  transition: transform 0.2s ease-in-out, opacity 0.3s ease-in-out;
+  transition: transform 0.3s ease-out, letter-spacing 0.3s ease-out, background 0.3s ease-out;
+}
+
+/* Remove the after pseudo-element entirely */
+.landing-title::after {
+  display: none;
 }
 
 .landing-title:hover {
-  transform: scale(1.01); /* Slightly enlarge */
-  opacity: 0.8; /* Make it slightly brighter */
+  transform: scale(1.01);
+  background: linear-gradient(120deg, 
+    rgba(255, 255, 255, 0.9), 
+    rgba(220, 220, 220, 0.8), 
+    rgba(255, 255, 255, 0.9),
+    rgba(220, 220, 220, 0.8));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 5px;
+  text-shadow: 
+    0 0 25px rgba(255, 255, 255, 0.3),
+    0 0 35px rgba(255, 255, 255, 0.2);
+  animation: glassShimmer 3s linear infinite, textGlow 2s ease-in-out infinite;
 }
-
 
 .landing-subtitle {
   font-size: 20px;

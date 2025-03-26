@@ -95,7 +95,7 @@ const LoginFeature = () => {
         )}
         {!showLogin && (
             <div className="landing-container">
-              <h1 className="landing-title" onClick={handleEnterClick}>NOSTYLIST</h1>
+              <h1 className="landing-title" onClick={handleEnterClick} data-text="NOSTYLIST">NOSTYLIST</h1>
             </div>
         )}
 
