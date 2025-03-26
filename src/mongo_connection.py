@@ -19,8 +19,11 @@ class MongoDB:
     def getdb(self):
         return self.__db
 
-# Instantiate the MongoDB class
-mongoDB = MongoDB
+# Connect to MongoDB Atlas
+connection_string = "mongodb+srv://alejandrovelez:YVES27@cluster0.snymu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
-# Get access to the database - use mongo_connection.db to access the db when importing this file
-db = mongoDB.getdb
+# Create a client and connect to database
+client = MongoClient(connection_string)
+
+# Access NOSTYLIST db
+db = client["NOSTYLIST"]
