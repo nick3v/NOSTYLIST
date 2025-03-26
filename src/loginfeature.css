@@ -29,6 +29,36 @@ body {
   overflow: hidden;
 }
 
+/* Mute Button */
+.mute-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 2px solid var(--primary-color);
+  color: var(--text-primary);
+  font-size: 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 1000;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.mute-button:hover {
+  background-color: var(--primary-color);
+  transform: scale(1.05);
+}
+
+.mute-button:focus {
+  outline: none;
+}
+
 /* Landing Page */
 .landing-container {
   display: flex;
