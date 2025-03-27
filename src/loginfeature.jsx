@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './loginfeature.css';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAudio } from './AudioContext';
 
 const LoginFeature = () => {
@@ -10,8 +10,16 @@ const LoginFeature = () => {
   const [loading, setLoading] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const { isMuted, toggleMute, playAudio } = useAudio();
+  const location = useLocation();
 
   useEffect(() => {
+    // Check URL parameters for showLogin
+    const params = new URLSearchParams(location.search);
+    if (params.get('showLogin') === 'true') {
+      setShowLogin(true);
+      playAudio();
+    }
+
     const resizeBackground = () => {
       document.body.style.backgroundSize = 'cover';
       document.body.style.backgroundPosition = 'center';
@@ -24,7 +32,7 @@ const LoginFeature = () => {
     return () => {
       window.removeEventListener('resize', resizeBackground);
     };
-  }, []);
+  }, [location, playAudio]);
 
   const handleEnterClick = () => {
     setShowLogin(true);

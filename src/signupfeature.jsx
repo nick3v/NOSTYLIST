@@ -156,7 +156,7 @@ const SignupFeature = () => {
             </form>
 
             <div className="login-footer">
-              <p>Already have an account? <Link to="/">Log in</Link></p>
+              <p>Already have an account? <Link to="/?showLogin=true">Log in</Link></p>
             </div>
           </div>
         </div>
