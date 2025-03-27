@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LoginFeature from './loginfeature';
 import SignupFeature from './signupfeature';
+import { AudioProvider } from './AudioContext';
 import './loginfeature.css';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -10,12 +11,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (rootElement) {
         ReactDOM.render(
             <React.StrictMode>
-                <BrowserRouter>
-                    <Routes>
-                        <Route path="/" element={<LoginFeature />} />
-                        <Route path="/signup" element={<SignupFeature />} />
-                    </Routes>
-                </BrowserRouter>
+                <AudioProvider>
+                    <BrowserRouter>
+                        <Routes>
+                            <Route path="/" element={<LoginFeature />} />
+                            <Route path="/signup" element={<SignupFeature />} />
+                        </Routes>
+                    </BrowserRouter>
+                </AudioProvider>
             </React.StrictMode>,
             rootElement
         );

@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './loginfeature.css';
+import { useAudio } from './AudioContext';
 
 const SignupFeature = () => {
   const [username, setUsername] = useState('');
@@ -9,16 +10,9 @@ const SignupFeature = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const audioRef = useRef(null);
+  const { isMuted, toggleMute } = useAudio();
 
   useEffect(() => {
-    // Play audio when component mounts
-    if (audioRef.current) {
-      audioRef.current.play().catch(error => console.error('Playback failed', error));
-    }
-
-    // Set background properties
     const resizeBackground = () => {
       document.body.style.backgroundSize = 'cover';
       document.body.style.backgroundPosition = 'center';
@@ -32,13 +26,6 @@ const SignupFeature = () => {
       window.removeEventListener('resize', resizeBackground);
     };
   }, []);
-
-  const toggleMute = () => {
-    if (audioRef.current) {
-      audioRef.current.muted = !audioRef.current.muted;
-      setIsMuted(!isMuted);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -79,7 +66,6 @@ const SignupFeature = () => {
 
   return (
       <div className="show-login" style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}>
-        <audio ref={audioRef} src="/In The Air.mp3" style={{ display: 'none' }}></audio>
         <button 
           className="mute-button" 
           onClick={toggleMute}

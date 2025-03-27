@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import './loginfeature.css';
 import { Link } from 'react-router-dom';
+import { useAudio } from './AudioContext';
 
 const LoginFeature = () => {
   const [username, setUsername] = useState('');
@@ -8,8 +9,7 @@ const LoginFeature = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const audioRef = useRef(null);
+  const { isMuted, toggleMute, playAudio } = useAudio();
 
   useEffect(() => {
     const resizeBackground = () => {
@@ -28,16 +28,7 @@ const LoginFeature = () => {
 
   const handleEnterClick = () => {
     setShowLogin(true);
-    if (audioRef.current) {
-      audioRef.current.play().catch(error => console.error('Playback failed', error));
-    }
-  };
-
-  const toggleMute = () => {
-    if (audioRef.current) {
-      audioRef.current.muted = !audioRef.current.muted;
-      setIsMuted(!isMuted);
-    }
+    playAudio();
   };
 
   const handleSubmit = async (e) => {
@@ -72,7 +63,6 @@ const LoginFeature = () => {
 
   return (
       <div className={showLogin ? 'show-login' : ''} style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}>
-        <audio ref={audioRef} src="/In The Air.mp3" style={{ display: 'none' }}></audio>
         {showLogin && (
           <button 
             className="mute-button" 
