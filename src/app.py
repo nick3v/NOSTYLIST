@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import users
+import images
 import os
 
 app = Flask(__name__)
