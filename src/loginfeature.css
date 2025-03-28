@@ -26,7 +26,50 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
+}
+
+/* Mute Button - Right Edge Position Fix */
+.mute-button {
+  position: fixed;
+  bottom: 5px;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 5px 0 0 5px;
+  background-color: #000000;
+  border: 1px solid var(--primary-color);
+  border-right: none;
+  color: var(--text-primary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 9999;
+  padding: 0;
+  margin: 0;
+  box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.5);
+  transform: translateX(0); /* Force position */
+  left: auto !important; /* Ensure it's not affected by left positioning */
+}
+
+.mute-button svg {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  display: block; /* Ensure proper display */
+}
+
+.mute-button:hover {
+  background-color: var(--primary-color);
+}
+
+.mute-button:focus {
+  outline: none;
 }
 
 /* Landing Page */
@@ -41,24 +84,63 @@ body {
   transition: transform 1s ease-in-out;
 }
 
+/* Glass shimmer animation */
+@keyframes glassShimmer {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Text glow animation for additional effect */
+@keyframes textGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.8));
+  }
+}
+
 .landing-title {
+  position: relative;
   font-size: 92px; /* Keep the size large */
   font-weight: 800;
   letter-spacing: 3px;
   text-transform: uppercase;
   background: linear-gradient(90deg, var(--primary-color), #5a5a5a);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 30px;
   cursor: pointer;
-  transition: transform 0.2s ease-in-out, opacity 0.3s ease-in-out;
+  transition: transform 0.3s ease-out, letter-spacing 0.3s ease-out, background 0.3s ease-out;
+}
+
+/* Remove the after pseudo-element entirely */
+.landing-title::after {
+  display: none;
 }
 
 .landing-title:hover {
-  transform: scale(1.01); /* Slightly enlarge */
-  opacity: 0.8; /* Make it slightly brighter */
+  transform: scale(1.01);
+  background: linear-gradient(120deg, 
+    rgba(255, 255, 255, 0.9), 
+    rgba(220, 220, 220, 0.8), 
+    rgba(255, 255, 255, 0.9),
+    rgba(220, 220, 220, 0.8));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 5px;
+  text-shadow: 
+    0 0 25px rgba(255, 255, 255, 0.3),
+    0 0 35px rgba(255, 255, 255, 0.2);
+  animation: glassShimmer 3s linear infinite, textGlow 2s ease-in-out infinite;
 }
-
 
 .landing-subtitle {
   font-size: 20px;
@@ -88,7 +170,7 @@ body {
   display: none;
   justify-content: center;
   align-items: center;
-  width: 100%;
+  width: 100vw;
   height: 100vh;
   opacity: 0;
   transform: translateX(100%);
@@ -110,6 +192,11 @@ body {
 
 .show-login {
   backdrop-filter: blur(4px);
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 .login-card {
@@ -119,6 +206,7 @@ body {
   border-radius: 12px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
   padding: 50px;
+  margin: 0 auto; /* Center horizontally */
 }
 
 .login-header {
@@ -182,12 +270,21 @@ body {
   width: 100%;
   padding: 16px;
   background-color: var(--primary-color);
-  color: #000;
+  color: #ffffff; /* Fix text color for better contrast */
   border: none;
   border-radius: 10px;
   font-size: 18px;
   font-weight: 700;
   cursor: pointer;
+  display: block; /* Ensure it's a block element */
+  box-sizing: border-box; /* Include padding in width calculation */
+  margin: 0 auto; /* Center the button */
+  max-width: 100%; /* Ensure button doesn't exceed container width */
+  text-align: center;
+}
+
+.login-button:hover {
+  background-color: var(--primary-hover);
 }
 
 .login-footer {

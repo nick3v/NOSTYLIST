@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './loginfeature.css';
+import { useAudio } from './AudioContext';
 
 const SignupFeature = () => {
   const [username, setUsername] = useState('');
@@ -9,15 +10,9 @@ const SignupFeature = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const audioRef = useRef(null);
+  const { isMuted, toggleMute } = useAudio();
 
   useEffect(() => {
-    // Play audio when component mounts
-    if (audioRef.current) {
-      audioRef.current.play().catch(error => console.error('Playback failed', error));
-    }
-
-    // Set background properties
     const resizeBackground = () => {
       document.body.style.backgroundSize = 'cover';
       document.body.style.backgroundPosition = 'center';
@@ -70,9 +65,26 @@ const SignupFeature = () => {
   };
 
   return (
-      <div className="show-login">
-        <audio ref={audioRef} src="/In The Air.mp3" style={{ display: 'none' }}></audio>
-        <div className="login-container" style={{ display: 'flex', opacity: 1, transform: 'translateX(0)' }}>
+      <div className="show-login" style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}>
+        <button 
+          className="mute-button" 
+          onClick={toggleMute}
+          title={isMuted ? "Unmute" : "Mute"}
+        >
+          {isMuted ? (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <line x1="23" y1="9" x2="17" y2="15"></line>
+              <line x1="17" y1="9" x2="23" y2="15"></line>
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+          )}
+        </button>
+        <div className="login-container" style={{ display: 'flex', opacity: 1, transform: 'translateX(0)', width: '100%' }}>
           <div className="login-card">
             <div className="login-header">
               <h1>NOSTYLIST</h1>
@@ -144,7 +156,7 @@ const SignupFeature = () => {
             </form>
 
             <div className="login-footer">
-              <p>Already have an account? <Link to="/">Log in</Link></p>
+              <p>Already have an account? <Link to="/?showLogin=true">Log in</Link></p>
             </div>
           </div>
         </div>

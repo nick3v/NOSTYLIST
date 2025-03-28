@@ -82,6 +82,8 @@ If you prefer a simpler approach without React:
 - MongoDB database integration
 - Secure password hashing
 - Responsive design
+- Audio control with mute/unmute functionality
+- Real-time audio state management
 
 ## Project Structure
 
@@ -92,11 +94,13 @@ NOSTYLIST/
 ├── src/                    # Backend Flask application
 │   ├── app.py              # Main Flask application
 │   ├── mongo_connection.py # MongoDB connection setup
-│   └── requirements.txt    # Python dependencies
+│   ├── requirements.txt    # Python dependencies
+│   ├── audio_controller.py # Audio control functionality
+│   └── static/            # Static assets
+│       ├── css/           # Stylesheets
+│       ├── js/            # JavaScript files
+│       └── images/        # Image assets
 ├── public/                 # Static assets
-├── src/                    # Frontend React application
-│   ├── index.js            # Entry point for React app
-│   └── loginfeature.jsx    # Login component
 ├── package.json            # Node.js dependencies
 └── webpack.config.js       # Webpack configuration
 ```
