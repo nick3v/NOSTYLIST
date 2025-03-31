@@ -34,7 +34,12 @@ def create_user(username, email, password):
         "username": username,
         "email": email,
         "password": hashed_password,
-        "created_at": datetime.datetime.utcnow()
+        "created_at": datetime.datetime.utcnow(),
+        "num_outfits": "0",
+        "num_hats": "0",
+        "num_shirts": "0",
+        "num_pants": "0",
+        "num_shoes": "0" # need to come back here if we add more accessories
     }
     
     try:
