@@ -64,8 +64,12 @@ def discard_outfit(username, outfit_num):
         else:
             image_description = "shoe"
             image_id = result["shoe_id"]
+        result3 = image_collection.find_one({"username": username, "image_description": image_description,
+                                             "image_id": image_id})
+        outfit_nums = result3["outfit_numbers"]
+        outfit_nums.remove(outfit_num)  # Take out the discarded outfit number
         image_collection.update_one({"username": username, "image_description": image_description,
-                                     "image_id": image_id}, {"$set": {"outfit_number": "0"}})
+                                     "image_id": image_id}, {"$set": {"outfit_numbers": outfit_nums}})
 
     # Delete outfit entry
     collection.delete_one({"username": username, "outfit_number": outfit_num})
@@ -77,7 +81,7 @@ def discard_outfit(username, outfit_num):
     for i in range(outfit_num + 1, num_outfits + 1):
         string_num2 = str(i)
         result2 = collection.find_one({"username": username, "outfit_number": string_num2})
-        num = i-1
+        num = i - 1
         string_num = str(num)
         collection.update_one({"username": username, "outfit_number": string_num2},
                               {"$set": {"outfit_number": string_num}})
@@ -96,9 +100,13 @@ def discard_outfit(username, outfit_num):
             else:
                 image_description = "shoe"
                 image_id = result2["shoe_id"]
-            image_collection.update_one({"username": username, "outfit_number": string_num2,
-                                         "image_description": image_description,"image_id": image_id},
-                                        {"$set": {"outfit_number": string_num}})
+            result3 = image_collection.find_one({"username": username, "image_description": image_description,
+                                                 "image_id": image_id})
+            outfit_nums = result3["outfit_numbers"]
+            index = outfit_nums.index(string_num2)
+            outfit_nums[index] = string_num
+            image_collection.update_one({"username": username,"image_description": image_description,
+                                         "image_id": image_id}, {"$set": {"outfit_numbers": outfit_nums}})
 
     # Decrement number of outfits in user collection
     num_outfits -= 1
