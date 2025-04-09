@@ -64,7 +64,8 @@ def save_image(username, image_description, binary_data, outfit_num=[]):
 # Only used to store the 4 stock images which will represent an "empty" clothing item a part of an outfit
 def save_stock_image(username, image_description, binary_data):  # DO NOT USE
     image_description = image_description.lower()
-    # The admin user will only have 1 clothing item for each category (all blank images) shown in the user counts
+    # The admin (alexjvd) user will only have 1 clothing item for each category (all placeholder images)
+    # shown in the user counts
     user_collection.update_one(
         {"username": username},
         {"$set": {"num_" + image_description + "s": "1"}}
@@ -81,8 +82,8 @@ def save_stock_image(username, image_description, binary_data):  # DO NOT USE
 def get_image(username, image_description, image_id, outfit_num=[]):
     # Get the image in binary format from mongo and return it
     if image_id == "-1":
-        result = collection.find_one(  # admin is the username that contains all stock images - can change to whatever
-            {"username": "admin", "outfit_numbers": [], "image_description": image_description,
+        result = collection.find_one(  # admin (alexjvd) is the username that contains all stock images - can change to whatever
+            {"username": "alexjvd", "outfit_numbers": [], "image_description": image_description,
              "image_id": image_id})
     else:
         result = collection.find_one(
