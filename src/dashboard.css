@@ -1,0 +1,64 @@
+.dashboard-container {
+  background-color: transparent;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.dashboard-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.4));
+  animation: spinY 5s linear infinite;
+  transform-style: preserve-3d;
+}
+
+@keyframes spinY {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
+.category-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.category-btn {
+  background-color: #fff;
+  color: #000;
+  padding: 8px 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.category-btn:hover {
+  background: #f0f0f0;
+  transform: translateY(-1px);
+}
+
+.active-filter {
+  background: #000;
+  color: #fff;
+  border: 1px solid white;
+}
