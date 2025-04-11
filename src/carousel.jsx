@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './carousel.css';
 
-const allImages = [
+const initialImages = [
   { src: '/rick shorts.jpg', category: 'Shorts' },
   { src: '/rick pants.jpg', category: 'Pants' },
   { src: '/rick jacket.jpg', category: 'Jackets' },
@@ -16,6 +16,7 @@ const categories = ['Pants', 'Shorts', 'Jackets'];
 const Carousel = () => {
   const carouselRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [allImages, setAllImages] = useState([...initialImages]);
   const [activeCategories, setActiveCategories] = useState([...categories]);
   const [outfit, setOutfit] = useState([]);
   const [zoomedImg, setZoomedImg] = useState(null);
@@ -78,23 +79,36 @@ const Carousel = () => {
   }, [currentIndex, filteredImages]);
 
   const handleDrop = (e) => {
-  e.preventDefault();
-  const src = e.dataTransfer.getData('src');
-  if (src && !outfit.includes(src)) {
-    setOutfit(prev => [...prev, src]);
-    // Remove from carousel by filtering it out of `allImages`
-    allImages.splice(allImages.findIndex(item => item.src === src), 1);
-    setCurrentIndex(0); // Reset index to re-render carousel layout
-  }
-};
+    e.preventDefault();
+    const src = e.dataTransfer.getData('src');
 
+    if (src && !outfit.includes(src)) {
+      const index = allImages.findIndex(item => item.src === src);
+      if (index !== -1) {
+        const image = allImages[index];
+        setOutfit(prev => [...prev, src]);
+        setAllImages(prev => {
+          const updated = [...prev];
+          updated.splice(index, 1); // remove only the first match
+          return updated;
+        });
+        setCurrentIndex(0);
+      }
+    }
+  };
 
   const handleDragStart = (e, src) => {
     e.dataTransfer.setData('src', src);
   };
 
   const removeFromOutfit = (src) => {
+    const categoryGuess = src.includes('shorts') ? 'Shorts' :
+                          src.includes('pants') ? 'Pants' :
+                          src.includes('jacket') ? 'Jackets' : 'Unknown';
+
     setOutfit(prev => prev.filter(item => item !== src));
+    setAllImages(prev => [...prev, { src, category: categoryGuess }]);
+    setCurrentIndex(0);
   };
 
   return (
