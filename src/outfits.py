@@ -14,7 +14,7 @@ image_collection = mongo_connection.db["images"]
 # Same for all clothing / image ids
 
 # outfit is a list of strings which contain all the image ids in this order:
-# Hat, Shirt, Pants, Shoes -- We can add more if needed
+# Hat, Shirt, Jacket, Shorts Pants, Shoes -- We can add more if needed
 def create_outfit(username, outfit):
     # Find the number of outfits the user has and update it in the user collection
     result = user_collection.find_one({"username": username})
@@ -28,11 +28,12 @@ def create_outfit(username, outfit):
 
     # Insert the outfit metadata into the database
     document = {"username": username, "outfit_number": string_num, "hat_id": str(outfit[0]), "shirt_id": str(outfit[1]),
-                "pant_id": str(outfit[2]), "shoe_id": str(outfit[3])}
+                "jacket_id": str(outfit[2]), "short_id": str(outfit[3]), "pant_id": str(outfit[4]),
+                "shoe_id": str(outfit[5])}
     collection.insert_one(document)
 
     # Update image collection respective outfit_numbers
-    for j in range(0, 4):
+    for j in range(0, 6):
         if j == 0:
             image_description = "hat"
             image_id = str(outfit[0])
@@ -40,11 +41,17 @@ def create_outfit(username, outfit):
             image_description = "shirt"
             image_id = str(outfit[1])
         elif j == 2:
-            image_description = "pant"
+            image_description = "jacket"
             image_id = str(outfit[2])
+        elif j == 3:
+            image_description = "short"
+            image_id = str(outfit[3])
+        elif j == 4:
+            image_description = "pant"
+            image_id = str(outfit[4])
         else:
             image_description = "shoe"
-            image_id = str(outfit[3])
+            image_id = str(outfit[5])
         result3 = image_collection.find_one({"username": username, "image_description": image_description,
                                              "image_id": image_id})
         outfit_nums = result3["outfit_numbers"]
@@ -62,8 +69,9 @@ def create_outfit(username, outfit):
 def get_outfit(username, outfit_num):
     result = collection.find_one({"username": username, "outfit_number": outfit_num})
     outfit = []
-    outfit.append(str(result["hat_id"])), outfit.append(str(result["shirt_id"])), outfit.append(str(result["pant_id"]))
-    outfit.append(str(result["shoe_id"]))
+    outfit.append(str(result["hat_id"])), outfit.append(str(result["shirt_id"])), \
+        outfit.append(str(result["jacket_id"]))
+    outfit.append(str(result["short_id"])), outfit.append(str(result["pant_id"])), outfit.append(str(result["shoe_id"]))
     return outfit
 
 
@@ -80,7 +88,7 @@ def discard_outfit(username, outfit_num):
     result = collection.find_one({"username": username, "outfit_number": outfit_num})
 
     # Update deleted outfit numbers in image collection
-    for j in range(0, 4):
+    for j in range(0, 6):
         if j == 0:
             image_description = "hat"
             image_id = str(result["hat_id"])
@@ -88,6 +96,12 @@ def discard_outfit(username, outfit_num):
             image_description = "shirt"
             image_id = str(result["shirt_id"])
         elif j == 2:
+            image_description = "jacket"
+            image_id = str(result["jacket_id"])
+        elif j == 3:
+            image_description = "short"
+            image_id = str(result["short_id"])
+        elif j == 4:
             image_description = "pant"
             image_id = str(result["pant_id"])
         else:
@@ -116,7 +130,7 @@ def discard_outfit(username, outfit_num):
                               {"$set": {"outfit_number": string_num}})
 
         # Decrement outfit numbers in image collection
-        for j in range(0, 4):
+        for j in range(0, 6):
             if j == 0:
                 image_description = "hat"
                 image_id = str(result2["hat_id"])
@@ -124,6 +138,12 @@ def discard_outfit(username, outfit_num):
                 image_description = "shirt"
                 image_id = str(result2["shirt_id"])
             elif j == 2:
+                image_description = "jacket"
+                image_id = str(result2["jacket_id"])
+            elif j == 3:
+                image_description = "short"
+                image_id = str(result2["short_id"])
+            elif j == 4:
                 image_description = "pant"
                 image_id = str(result2["pant_id"])
             else:
@@ -144,8 +164,9 @@ def discard_outfit(username, outfit_num):
 
     # Return the list of all image ids so that deleting images is possible if needed
     outfit_list = []
-    outfit_list.append(str(result["hat_id"])), outfit_list.append(str(result["shirt_id"])), \
-        outfit_list.append(str(result["pant_id"])), outfit_list.append(str(result["shoe_id"]))
+    outfit_list.append(str(result["hat_id"])), outfit_list.append(str(result["shirt_id"]))
+    outfit_list.append(str(result["jacket_id"])), outfit_list.append(str(result["short_id"]))
+    outfit_list.append(str(result["pant_id"])), outfit_list.append(str(result["shoe_id"]))
     return outfit_list
 
 # Example code using discard_outfit()
