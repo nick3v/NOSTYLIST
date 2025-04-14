@@ -1,0 +1,214 @@
+@import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;700&display=swap');
+
+/* === LAYOUT CONTAINER === */
+.dashboard-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+  color: white;
+  overflow: hidden;
+}
+
+/* === SIDEBAR (LEFT) === */
+.sidebar {
+  width: 240px;
+  height: 100vh;
+  background: rgba(10, 10, 10, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 24px;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  font-family: 'Kantumruy Pro', sans-serif;
+}
+
+.sidebar-logo {
+  font-weight: bold;
+  font-size: 20px;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sidebar-menu button {
+  background: none;
+  color: white;
+  border: none;
+  font-size: 16px;
+  text-align: left;
+  cursor: pointer;
+  padding: 6px 0;
+  transition: all 0.2s ease;
+  font-family: 'Kantumruy Pro', sans-serif;
+}
+
+.sidebar-menu button:hover {
+  color: #ccc;
+  transform: translateX(4px);
+}
+
+/* === MAIN CONTENT AREA === */
+.dashboard-content {
+  margin-left: 240px;
+  margin-right: 240px;
+  width: calc(100% - 480px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 20px;
+}
+
+/* === RIGHT SIDEBAR === */
+.right-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 240px;
+  height: 100vh;
+  background: rgba(10, 10, 10, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 16px;
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  z-index: 10;
+  color: white;
+  overflow-y: auto;
+  font-family: 'Kantumruy Pro', sans-serif;
+}
+
+.right-sidebar h2 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  text-align: center;
+  color: white;
+}
+
+.fit-item {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.fit-item img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-size: 10px;
+  font-family: 'Kantumruy Pro', sans-serif;
+}
+
+/* === HEADER === */
+.dashboard-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.logo {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.4));
+  animation: spinY 5s linear infinite;
+  transform-style: preserve-3d;
+}
+
+@keyframes spinY {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
+/* === CATEGORY FILTER BUTTONS === */
+.category-buttons,
+.category-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.category-btn,
+.filter-btn {
+  background-color: #fff;
+  color: #000;
+  padding: 8px 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Kantumruy Pro', sans-serif;
+}
+
+.category-btn:hover,
+.filter-btn:hover {
+  background: #f0f0f0;
+  transform: translateY(-1px);
+}
+
+.active-filter,
+.filter-btn.active {
+  background: #000;
+  color: #fff;
+  border: 1px solid white;
+}
+
+/* === CAROUSEL WRAPPER === */
+.carousel-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+  position: relative;
+}
+
+.carousel-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 1200px;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+}

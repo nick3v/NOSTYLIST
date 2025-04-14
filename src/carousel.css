@@ -1,0 +1,283 @@
+@import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;700&display=swap');
+
+/* === CONTAINER === */
+.carousel-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.carousel-container {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  perspective: 1200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* === CAROUSEL CORE === */
+.carousel {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  transform-style: preserve-3d;
+  transition: all 0.5s ease-in-out;
+}
+
+.carousel-item {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  top: 50%;
+  left: 50%;
+  transform-origin: center;
+  transition: transform 0.5s, opacity 0.5s;
+  opacity: 0;
+  z-index: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow:
+    0 10px 20px rgba(255, 255, 255, 0.4),
+    0 0 0 3px rgba(126, 10, 10, 0),
+    inset 0 -4px 6px rgba(0, 0, 0, 0.3);
+  transform-style: preserve-3d;
+}
+
+.carousel-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* === ACTIVE STATES === */
+.carousel-item.active {
+  opacity: 1;
+  transform: translate(-50%, -50%) translateZ(200px) rotateY(0deg) scale(1.1);
+  z-index: 5;
+}
+.carousel-item.prev {
+  opacity: 0.8;
+  transform: translate(-50%, -50%) translateX(-250px) translateZ(-50px) rotateY(-45deg) scale(0.9);
+  z-index: 4;
+}
+.carousel-item.prev-2 {
+  opacity: 0.6;
+  transform: translate(-50%, -50%) translateX(-400px) translateZ(-150px) rotateY(-60deg) scale(0.7);
+  z-index: 3;
+}
+.carousel-item.prev-3 {
+  opacity: 0.2;
+  transform: translate(-50%, -50%) translateX(-500px) translateZ(-300px) rotateY(-70deg) scale(0.5);
+  z-index: 2;
+}
+.carousel-item.next {
+  opacity: 0.8;
+  transform: translate(-50%, -50%) translateX(250px) translateZ(-50px) rotateY(45deg) scale(0.9);
+  z-index: 4;
+}
+.carousel-item.next-2 {
+  opacity: 0.6;
+  transform: translate(-50%, -50%) translateX(400px) translateZ(-150px) rotateY(60deg) scale(0.7);
+  z-index: 3;
+}
+.carousel-item.next-3 {
+  opacity: 0.2;
+  transform: translate(-50%, -50%) translateX(500px) translateZ(-300px) rotateY(70deg) scale(0.5);
+  z-index: 2;
+}
+
+/* === GRADIENT SHADOWS === */
+.carousel-item.prev-2::before,
+.carousel-item.prev-3::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.8) 10%, rgba(0, 0, 0, 0.4) 70%);
+  z-index: 2;
+  pointer-events: none;
+}
+.carousel-item.next-2::before,
+.carousel-item.next-3::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.8) 10%, rgba(0, 0, 0, 0.4) 70%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* === ARROWS === */
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: none;
+  width: 30px;
+  height: 30px;
+  font-size: 20px;
+  font-weight: bold;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background 0.3s, transform 0.3s;
+  animation: fadeSlideIn 0.6s ease forwards;
+  opacity: 0;
+}
+.carousel-arrow.left { left: 20%; }
+.carousel-arrow.right { right: 20%; }
+.carousel-arrow:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-50%) scale(1.1);
+}
+.carousel-arrow:active {
+  background: rgba(255, 255, 255, 0.4);
+  transform: translateY(-50%) scale(0.95);
+}
+
+/* === FILTER BUTTONS === */
+.category-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.filter-btn {
+  background: transparent;
+  color: white;
+  padding: 8px 16px;
+  border: 1px solid white;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Kantumruy Pro', sans-serif;
+}
+.filter-btn:hover {
+  background: white;
+  color: black;
+}
+.filter-btn.active {
+  background: white;
+  color: black;
+}
+
+/* === RIGHT SIDEBAR === */
+.right-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 240px;
+  height: 100vh;
+  background: rgba(10, 10, 10, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 16px;
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  z-index: 10;
+  color: white;
+  overflow-y: auto;
+  font-family: 'Kantumruy Pro', sans-serif;
+}
+
+.right-sidebar h2 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  text-align: center;
+  color: white;
+}
+.fit-item {
+  position: relative;
+  margin-bottom: 10px;
+}
+.fit-item img {
+  width: 100%;
+  border-radius: 8px;
+}
+.remove-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-size: 10px;
+  font-family: 'Kantumruy Pro', sans-serif;
+}
+
+/* === MODAL === */
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.zoomed-img {
+  max-width: 500px;
+  max-height: 80vh;
+  border-radius: 10px;
+}
+.modal-content {
+  background: #111;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+  text-align: center;
+}
+.modal-content button {
+  background: white;
+  color: black;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* === MISC === */
+.no-results {
+  color: white;
+  text-align: center;
+  font-size: 16px;
+  padding: 40px 0;
+  font-style: italic;
+  opacity: 0.8;
+  animation: fadeIn 0.4s ease-in-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+}
