@@ -10,8 +10,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f4ae9df2-c745-4a3e-a51a-8328e99b0411" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/public/carti hat.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/rick boots.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/shirt.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/AllItemsPage.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/AllItemsPage.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/App.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/carousel.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/carousel.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/carousel.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/carousel.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/dashboard.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/dashboard.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/dashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/dashboard.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/images.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/images.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,7 +120,7 @@
       <workItem from="1744297248249" duration="656000" />
       <workItem from="1744298667536" duration="314000" />
       <workItem from="1744320433928" duration="2000" />
-      <workItem from="1744386496433" duration="2695000" />
+      <workItem from="1744386496433" duration="17395000" />
     </task>
     <servers />
   </component>

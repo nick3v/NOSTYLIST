@@ -77,6 +77,19 @@ def delete_outfit(user_id, outfit_num):
             image_id = result["shoe_id"]
         images.delete_image(username, image_description, image_id, outfit_num)
 
+
+@app.route('/api/users/<user_id>/all-items', methods=['GET'])
+def get_all_clothing_items(user_id):
+    result = users.get_user_by_id(user_id)
+    if not result["success"]:
+        return jsonify({"success": False, "message": "User not found"}), 404
+
+    username = result["username"]
+    all_items = images.get_all_images(username)
+
+    return jsonify({"success": True, "items": all_items}), 200
+
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5001))
     app.run(host='0.0.0.0', port=port, debug=True)

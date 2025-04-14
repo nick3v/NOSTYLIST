@@ -1,6 +1,7 @@
 import mongo_connection
 from bson import Binary
 import os
+import base64
 
 # The collection name "images" will store all image data into the NOSTYLIST database
 collection = mongo_connection.db["images"]
@@ -155,3 +156,23 @@ def get_num_shoes(username):
     result = user_collection.find_one({"username": username})
     num = result["num_shoes"]
     return num
+
+# for show all items - marco
+def get_all_images(username):
+    # Find all images not part of stock (-1) and not attached to outfits (outfit_number = "0")
+    user_images = collection.find({
+        "username": username,
+        "image_id": {"$ne": "-1"}
+    })
+
+    result = []
+    for img in user_images:
+        encoded = base64.b64encode(img["image_data"]).decode("utf-8")
+        result.append({
+            "image_id": img["image_id"],
+            "description": img["image_description"],
+            "outfit_number": img["outfit_number"],
+            "base64": f"data:image/png;base64,{encoded}"
+        })
+
+    return result

@@ -5,13 +5,16 @@ import './carousel.css';
 const initialImages = [
   { src: '/rick shorts.jpg', category: 'Shorts' },
   { src: '/rick pants.jpg', category: 'Pants' },
-  { src: '/rick jacket.jpg', category: 'Jackets' },
+  { src: '/rick jacket.jpg', category: 'Jackets/Long Sleeves/Hoodies' },
   { src: '/rick shorts.jpg', category: 'Shorts' },
+  { src: '/shirt.jpg', category: 'Shirts' },
   { src: '/rick pants.jpg', category: 'Pants' },
-  { src: '/rick jacket.jpg', category: 'Jackets' }
+  { src: '/rick jacket.jpg', category: 'Jackets' },
+  { src: '/carti hat.jpg', category: 'Hats' },
+  { src: '/rick boots.jpg', category: 'Shoes' }
 ];
 
-const categories = ['Pants', 'Shorts', 'Jackets'];
+const categories = ['Pants', 'Shorts', 'Shirts', 'Jackets/Long Sleeves/Hoodies', 'Shoes', 'Hats'];
 
 const Carousel = () => {
   const carouselRef = useRef(null);
@@ -89,7 +92,7 @@ const Carousel = () => {
         setOutfit(prev => [...prev, src]);
         setAllImages(prev => {
           const updated = [...prev];
-          updated.splice(index, 1); // remove only the first match
+          updated.splice(index, 1);
           return updated;
         });
         setCurrentIndex(0);
@@ -104,7 +107,9 @@ const Carousel = () => {
   const removeFromOutfit = (src) => {
     const categoryGuess = src.includes('shorts') ? 'Shorts' :
                           src.includes('pants') ? 'Pants' :
-                          src.includes('jacket') ? 'Jackets' : 'Unknown';
+                          src.includes('jacket') ? 'Jackets' :
+                          src.includes('boots') ? 'Shoes' :
+                          src.includes('hat') ? 'Hats' : 'Unknown';
 
     setOutfit(prev => prev.filter(item => item !== src));
     setAllImages(prev => [...prev, { src, category: categoryGuess }]);
@@ -112,61 +117,63 @@ const Carousel = () => {
   };
 
   return (
-    <div>
-      <div className="category-toggle">
-        <button
-          className={`filter-btn ${isAllActive ? 'active' : ''}`}
-          onClick={() => toggleCategory('All')}
-        >
-          All
-        </button>
-        {categories.map(cat => (
+    <div className="dashboard-container">
+      <div className="dashboard-content">
+        <div className="category-toggle">
           <button
-            key={cat}
-            className={`filter-btn ${activeCategories.includes(cat) ? 'active' : ''}`}
-            onClick={() => toggleCategory(cat)}
+            className={`filter-btn ${isAllActive ? 'active' : ''}`}
+            onClick={() => toggleCategory('All')}
           >
-            {cat}
+            All
           </button>
-        ))}
-      </div>
-
-      <div className="carousel-container">
-        <button className="carousel-arrow left" onClick={prevSlide}>&larr;</button>
-        <div className="carousel" ref={carouselRef}>
-          <AnimatePresence mode="wait">
-            {filteredImages.map((img, i) => (
-              <motion.div
-                className="carousel-item"
-                key={i}
-                drag="x"
-                dragConstraints={{ left: 0, right: 0 }}
-                onClick={() => setZoomedImg(img.src)}
-              >
-                <div
-                  onDragStart={(e) => handleDragStart(e, img.src)}
-                  draggable
-                  style={{ width: '100%', height: '100%' }}
-                >
-                  <img
-                    src={img.src}
-                    alt={`img-${i}`}
-                    style={{ width: '100%', height: '100%', pointerEvents: 'none' }}
-                  />
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+          {categories.map(cat => (
+            <button
+              key={cat}
+              className={`filter-btn ${activeCategories.includes(cat) ? 'active' : ''}`}
+              onClick={() => toggleCategory(cat)}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
-        <button className="carousel-arrow right" onClick={nextSlide}>&rarr;</button>
+
+        <div className="carousel-container">
+          <button className="carousel-arrow left" onClick={prevSlide}>&larr;</button>
+          <div className="carousel" ref={carouselRef}>
+            <AnimatePresence mode="wait">
+              {filteredImages.map((img, i) => (
+                <motion.div
+                  className="carousel-item"
+                  key={i}
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  onClick={() => setZoomedImg(img.src)}
+                >
+                  <div
+                    onDragStart={(e) => handleDragStart(e, img.src)}
+                    draggable
+                    style={{ width: '100%', height: '100%' }}
+                  >
+                    <img
+                      src={img.src}
+                      alt={`img-${i}`}
+                      style={{ width: '100%', height: '100%', pointerEvents: 'none' }}
+                    />
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+          <button className="carousel-arrow right" onClick={nextSlide}>&rarr;</button>
+        </div>
       </div>
 
       <div
-        className="drop-zone"
+        className="right-sidebar"
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
       >
-        <h3>Your Fit</h3>
+        <h2>Your Fit</h2>
         {outfit.map((src, idx) => (
           <div key={idx} className="fit-item">
             <img src={src} alt="fit" />
