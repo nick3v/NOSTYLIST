@@ -2,7 +2,7 @@ import path from 'path';
 
 export default {
   mode: 'development',
-  entry: './src/index.js',
+  entry: './src/frontend/index.js',
   output: {
     path: path.resolve(process.cwd(), 'dist'),
     filename: 'bundle.js',

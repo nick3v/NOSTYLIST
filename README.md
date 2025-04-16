@@ -1,6 +1,6 @@
 # NOSTYLIST
 
-A modern authentication system with a dark-themed UI, built with Flask, MongoDB, and React.
+A modern and stylish wardrobe management tool
 
 ## Prerequisites
 
@@ -31,19 +31,18 @@ A modern authentication system with a dark-themed UI, built with Flask, MongoDB,
 
 3. Install Python dependencies:
    ```bash
-   pip install -r src/requirements.txt
+   pip install -r src/backend/requirements.txt
    ```
 
 4. Configure MongoDB:
    - Make sure MongoDB is running on your system
-   - Update connection string in `src/mongo_connection.py` if needed
+   - Update connection string in `src/backend/mongo_connection.py` if needed
 
 5. Start the Flask backend server:
    ```bash
-   cd src
-   python app.py
+   python src/backend/app.py
    ```
-   The backend will run on http://localhost:5000
+   The backend will run on http://localhost:5001
 
 ### Frontend Setup
 
@@ -51,11 +50,6 @@ A modern authentication system with a dark-themed UI, built with Flask, MongoDB,
    ```bash
    npm install
    ```
-   1.1 May need to install "webpack" dependency using:
-
-    ```bash
-      -r src/npm_requirements.txt
-      ```
 
 2. Build the frontend:
    ```bash
@@ -66,7 +60,7 @@ A modern authentication system with a dark-themed UI, built with Flask, MongoDB,
    ```bash
    npm start
    ```
-   The frontend will run on http://localhost:3000
+   The frontend will run on http://localhost:3002
 
 ### Alternative: Standalone HTML Version
 
@@ -90,19 +84,39 @@ If you prefer a simpler approach without React:
 ```
 NOSTYLIST/
 ├── .gitignore              # Git ignore file
-├── .venv/                  # Python virtual environment (not tracked in git)
-├── src/                    # Backend Flask application
-│   ├── app.py              # Main Flask application
-│   ├── mongo_connection.py # MongoDB connection setup
-│   ├── requirements.txt    # Python dependencies
-│   ├── audio_controller.py # Audio control functionality
-│   └── static/            # Static assets
-│       ├── css/           # Stylesheets
-│       ├── js/            # JavaScript files
-│       └── images/        # Image assets
-├── public/                 # Static assets
-├── package.json            # Node.js dependencies
-└── webpack.config.js       # Webpack configuration
+├── .venv/                  # Python virtual environment (if created)
+├── node_modules/           # Node.js dependencies (not tracked in git)
+├── src/
+│   ├── backend/            # Backend Flask application
+│   │   ├── app.py              # Main Flask application
+│   │   ├── images.py           # Image processing logic (example)
+│   │   ├── outfits.py          # Outfit logic (example)
+│   │   ├── users.py            # User logic (example)
+│   │   ├── mongo_connection.py # MongoDB connection setup
+│   │   └── requirements.txt    # Python dependencies
+│   └── frontend/           # Frontend React application
+│       ├── components/       # Reusable React components
+│       ├── assets/           # Static assets (images, etc.)
+│       ├── index.js          # Entry point for React app
+│       ├── App.jsx             # Main application component
+│       ├── AllItemsPage.jsx    # Example page component
+│       ├── UploadImage.jsx     # Example page component
+│       ├── dashboard.jsx       # Example page component
+│       ├── loginfeature.jsx    # Example component
+│       ├── signupfeature.jsx   # Example component
+│       ├── carousel.jsx        # Example component
+│       ├── AudioContext.jsx    # Context for audio
+│       ├── *.css               # CSS files
+│       └── ...               # Other frontend files
+├── public/                 # Static assets served directly
+├── dist/                   # Frontend build output (not tracked in git)
+├── login.html              # Standalone HTML login page
+├── test-api.js             # API test script
+├── package.json            # Node.js configuration and dependencies
+├── package-lock.json       # Exact Node.js dependencies
+├── webpack.config.js       # Webpack configuration
+├── .babelrc                # Babel configuration
+└── README.md               # This file
 ```
 
 ## Development Workflow
@@ -133,9 +147,9 @@ When working with Git:
 ## Troubleshooting
 
 - **Blank page when running npm start**: Try opening `login.html` directly in your browser as an alternative
-- **MongoDB connection issues**: Verify MongoDB is running and check connection string in `src/mongo_connection.py`
-- **Missing dependencies**: Run `npm install` and `pip install -r src/requirements.txt` again
-- **Port conflicts**: If port 3000 or 5000 is already in use, modify the port in `webpack.config.js` or `src/app.py`
+- **MongoDB connection issues**: Verify MongoDB is running and check connection string in `src/backend/mongo_connection.py`
+- **Missing dependencies**: Run `npm install` and `pip install -r src/backend/requirements.txt` again
+- **Port conflicts**: If port 3002 or 5001 is already in use, modify the port in `webpack.config.js` or `src/backend/app.py`
 - **Permission denied errors**: If you encounter permission issues with executable files in `node_modules/.bin`, run `chmod +x node_modules/.bin/*`
 
 ## API Endpoints
