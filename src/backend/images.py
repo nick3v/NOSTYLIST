@@ -83,7 +83,8 @@ def save_stock_image(username, image_description, binary_data):  # DO NOT USE
 def get_image(username, image_description, image_id, outfit_num=[]):
     # Get the image in binary format from mongo and return it
     if image_id == "-1":
-        result = collection.find_one(  # admin (alexjvd) is the username that contains all stock images - can change to whatever
+        result = collection.find_one(
+            # admin (alexjvd) is the username that contains all stock images - can change to whatever
             {"username": "alexjvd", "outfit_numbers": [], "image_description": image_description,
              "image_id": image_id})
     else:
@@ -129,6 +130,7 @@ def delete_image(username, image_description, image_id, outfit_num=[]):
     string_num = str(num_image)
     user_collection.update_one({"username": username}, {"$set": {"num_" + image_description + "s": string_num}})
 
+
 # Example code using delete_image(username, image_description, image_id, outfit_num=[]):
 # delete_image("BobbySandimandie","hat", "1") - if no outfit_num list is passed it's not a part of outfit
 
@@ -139,6 +141,10 @@ def get_num_image(username, image_description):
         return get_num_hats(username)
     elif image_description == "shirt":
         return get_num_shirts(username)
+    elif image_description == "jacket":
+        return get_num_jackets(username)
+    elif image_description == "short":
+        return get_num_shorts(username)
     elif image_description == "pant":
         return get_num_pants(username)
     else:
@@ -156,6 +162,20 @@ def get_num_hats(username):
 def get_num_shirts(username):
     result = user_collection.find_one({"username": username})
     num = result["num_shirts"]
+    return num
+
+
+# Return number of jackets / long sleeves / hoodies user has (string)
+def get_num_jackets(username):
+    result = user_collection.find_one({"username": username})
+    num = result["num_jackets"]
+    return num
+
+
+# Return number of shorts user has (string)
+def get_num_shorts(username):
+    result = user_collection.find_one({"username": username})
+    num = result["num_shorts"]
     return num
 
 
