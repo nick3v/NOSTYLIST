@@ -6,11 +6,11 @@ import './carousel.css';
 const initialImages = [
   { src: '/rick shorts.jpg', category: 'Shorts' },
   { src: '/rick pants.jpg', category: 'Pants' },
-  { src: '/rick jacket.jpg', category: 'Jackets/Long Sleeves/Hoodies' },
+  { src: '/rick jacket.jpg', category: 'Long Sleeves' },
   { src: '/rick shorts.jpg', category: 'Shorts' },
   { src: '/shirt.jpg', category: 'Shirts' },
   { src: '/rick pants.jpg', category: 'Pants' },
-  { src: '/rick jacket.jpg', category: 'Jackets' },
+  { src: '/long sleeve.jpg', category: 'Long Sleeves' },
   { src: '/carti hat.jpg', category: 'Hats' },
   { src: '/rick boots.jpg', category: 'Shoes' }
 ];
@@ -20,10 +20,13 @@ const categoryMapping = {
   'hat': 'Hats',
   'shirt': 'Shirts',
   'pant': 'Pants',
-  'shoe': 'Shoes'
+  'shoe': 'Shoes',
+  'long sleeve': 'Long Sleeves',
+  'shorts': 'Shorts'
 };
 
-const categories = ['Pants', 'Shorts', 'Shirts', 'Jackets/Long Sleeves/Hoodies', 'Shoes', 'Hats'];
+// UI categories for filtering - match exactly with the categoryMapping values
+const categories = ['Hats', 'Shirts', 'Pants', 'Shorts', 'Long Sleeves', 'Shoes'];
 
 const Carousel = () => {
   const carouselRef = useRef(null);
@@ -80,9 +83,13 @@ const Carousel = () => {
             const formattedImages = data.items.map(item => {
               // Image URL already includes data:image prefix from the API
               const imageUrl = item.base64;
+              
+              // Log raw category from backend for debugging
+              console.log(`Item category from backend: "${item.category}"`);
                 
               // Map category from database to UI category
-              const mappedCategory = categoryMapping[item.category] || 'Other';
+              const mappedCategory = categoryMapping[item.category.toLowerCase()] || 'Other';
+              console.log(`Mapped to UI category: "${mappedCategory}"`);
               
               return {
                 src: imageUrl,
@@ -124,13 +131,46 @@ const Carousel = () => {
   const isAllActive = activeCategories.length === categories.length;
   const filteredImages = allImages.filter(img => activeCategories.includes(img.category));
 
-  const toggleCategory = (category) => {
-    if (category === 'All') setActiveCategories([...categories]);
-    else {
-      setActiveCategories(prev =>
-        prev.includes(category) ? prev.filter(c => c !== category) : [...prev, category]
-      );
+  // Ensure proper filtering when active categories change
+  useEffect(() => {
+    if (activeCategories.length === 1) {
+      console.log(`Ensuring only ${activeCategories[0]} items are showing`);
+      // Force filtered images to be recalculated with latest state
+      const currentFiltered = allImages.filter(img => activeCategories.includes(img.category));
+      console.log(`Found ${currentFiltered.length} items matching category ${activeCategories[0]}`);
+      
+      // Force rebuild carousel to ensure filters are applied immediately
+      setCarouselKey(prev => prev + 1);
     }
+  }, [activeCategories, allImages]);
+
+  // Log filtering for debugging
+  useEffect(() => {
+    console.log('Active categories:', activeCategories);
+    console.log('Total images:', allImages.length);
+    console.log('Filtered images:', filteredImages.length);
+    
+    // Log categories of all images for debugging
+    const categoryCounts = {};
+    allImages.forEach(img => {
+      categoryCounts[img.category] = (categoryCounts[img.category] || 0) + 1;
+    });
+    console.log('Images by category:', categoryCounts);
+  }, [activeCategories, allImages, filteredImages.length]);
+
+  const toggleCategory = (category) => {
+    if (category === 'All') {
+      console.log('Setting all categories active');
+      setActiveCategories([...categories]);
+    } else {
+      console.log(`Setting only category "${category}" active`);
+      // Show only the clicked category
+      setActiveCategories([category]);
+    }
+    // Reset to first slide when changing filters
+    setCurrentIndex(0);
+    // Force rebuild carousel when category changes
+    setCarouselKey(prev => prev + 1);
   };
 
   const prevSlide = () => {
@@ -273,12 +313,13 @@ useEffect(() => {
     if (originalItem) {
         categoryGuess = originalItem.category;
     } else {
-        // Fallback category guessing
-        categoryGuess = src.includes('shorts') ? 'Shorts' :
-                        src.includes('pants') ? 'Pants' :
-                        src.includes('jacket') ? 'Jackets' :
-                        src.includes('boots') ? 'Shoes' :
-                        src.includes('hat') ? 'Hats' : 'Other';
+        // Fallback category guessing for all 6 categories
+        categoryGuess = src.includes('hat') ? 'Hats' :
+                        src.includes('shoe') || src.includes('boots') ? 'Shoes' :
+                        src.includes('shorts') ? 'Shorts' :
+                        src.includes('sleeve') ? 'Long Sleeves' :
+                        src.includes('shirt') ? 'Shirts' :
+                        'Pants'; // Default to pants
     }
     
     console.log(`Removing from outfit: ${src.substring(0, 20)}..., Category: ${categoryGuess}`);
@@ -327,17 +368,44 @@ useEffect(() => {
             className={`filter-btn ${isAllActive ? 'active' : ''}`}
             onClick={() => toggleCategory('All')}
           >
-            All
+            All Items
           </button>
-          {categories.map(cat => (
-            <button
-              key={cat}
-              className={`filter-btn ${activeCategories.includes(cat) ? 'active' : ''}`}
-              onClick={() => toggleCategory(cat)}
-            >
-              {cat}
-            </button>
-          ))}
+          {categories.map(cat => {
+            // Add emoji icons to make categories more visual
+            let buttonIcon = '';
+            switch(cat) {
+              case 'Hats':
+                buttonIcon = '👒 ';
+                break;
+              case 'Shirts':
+                buttonIcon = '👕 ';
+                break;
+              case 'Pants':
+                buttonIcon = '👖 ';
+                break;
+              case 'Shorts':
+                buttonIcon = '🩳 ';
+                break;
+              case 'Long Sleeves':
+                buttonIcon = '🧥 ';
+                break;
+              case 'Shoes':
+                buttonIcon = '👟 ';
+                break;
+              default:
+                buttonIcon = '';
+            }
+            
+            return (
+              <button
+                key={cat}
+                className={`filter-btn ${activeCategories.includes(cat) && activeCategories.length === 1 ? 'active' : ''}`}
+                onClick={() => toggleCategory(cat)}
+              >
+                {buttonIcon}{cat}
+              </button>
+            );
+          })}
         </div>
 
         {filteredImages.length === 0 ? (
@@ -347,7 +415,7 @@ useEffect(() => {
             {!zoomedImg && <button className="carousel-arrow left" onClick={prevSlide}>&larr;</button>}
             <div className="carousel" ref={carouselRef}>
               {filteredImages.map((img, i) => (
-                <div className="carousel-item" key={img.id}>
+                <div className="carousel-item" key={`${img.id}-${carouselKey}`}>
                   <div className="carousel-item-content">
                     <div 
                       className="image-wrapper"
