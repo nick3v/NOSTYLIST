@@ -37,7 +37,7 @@ A modern and stylish wardrobe management tool
 4. Configure MongoDB:
    - Make sure MongoDB is running on your system
    - Update connection string in `src/backend/mongo_connection.py` if needed
-
+n
 5. Start the Flask backend server:
    ```bash
    python src/backend/app.py

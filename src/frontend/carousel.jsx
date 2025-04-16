@@ -35,6 +35,7 @@ const Carousel = () => {
   const [outfit, setOutfit] = useState([]);
   const [zoomedImg, setZoomedImg] = useState(null);
   const intervalRef = useRef(null);
+  const [carouselKey, setCarouselKey] = useState(0);
 
   // Fetch images from the backend when component mounts
   useEffect(() => {
@@ -132,66 +133,131 @@ const Carousel = () => {
     }
   };
 
-  const prevSlide = () => setCurrentIndex((prev) => (prev - 1 + filteredImages.length) % filteredImages.length);
-  const nextSlide = () => setCurrentIndex((prev) => (prev + 1) % filteredImages.length);
+  const prevSlide = () => {
+    setCurrentIndex(prevIndex => {
+        // Recalculate filtered length inside the update function for accuracy
+        const currentFilteredLength = allImages.filter(img => activeCategories.includes(img.category)).length;
+        if (currentFilteredLength === 0) return 0; // Avoid NaN with modulo 0
+        return (prevIndex - 1 + currentFilteredLength) % currentFilteredLength;
+    });
+  };
 
+  const nextSlide = () => {
+    setCurrentIndex(prevIndex => {
+        // Recalculate filtered length inside the update function for accuracy
+        const currentFilteredLength = allImages.filter(img => activeCategories.includes(img.category)).length;
+        if (currentFilteredLength === 0) return 0; // Avoid NaN with modulo 0
+        return (prevIndex + 1) % currentFilteredLength;
+    });
+  };
+
+  // Simple function to handle image zoom
+  const handleImageClick = (src, index) => {
+    setCurrentIndex(index);
+    setZoomedImg(src);
+  };
+
+  // Simple function to close the zoomed view
+  const closeZoom = () => {
+    setZoomedImg(null);
+    clearInterval(intervalRef.current);
+    // Ensure carousel resumes auto-rotation
+    if (filteredImages.length > 0) {
+        intervalRef.current = setInterval(nextSlide, 4000);
+    }
+  };
+
+  // Auto-rotation and keyboard navigation control
   useEffect(() => {
+    const currentFilteredImages = allImages.filter(img => activeCategories.includes(img.category));
+    
+    clearInterval(intervalRef.current);
+    intervalRef.current = null;
+
+    if (!zoomedImg && currentFilteredImages.length > 0) {
+        intervalRef.current = setInterval(nextSlide, 4000);
+    }
+
     const handleKey = (e) => {
-      if (e.key === 'ArrowLeft') prevSlide();
-      if (e.key === 'ArrowRight') nextSlide();
+        if (!zoomedImg) {
+            if (e.key === 'ArrowLeft') prevSlide();
+            if (e.key === 'ArrowRight') nextSlide();
+        }
     };
     document.addEventListener('keydown', handleKey);
-    intervalRef.current = setInterval(nextSlide, 4000);
-    return () => {
-      document.removeEventListener('keydown', handleKey);
-      clearInterval(intervalRef.current);
-    };
-  }, [filteredImages]);
 
-  useEffect(() => {
-    if (!carouselRef.current || filteredImages.length === 0) return;
+    return () => {
+        document.removeEventListener('keydown', handleKey);
+        clearInterval(intervalRef.current);
+    };
+}, [allImages, activeCategories, zoomedImg]); // Keep dependencies
+
+// Update carousel item classes based on index and filtered list
+useEffect(() => {
+    const currentFilteredImages = allImages.filter(img => activeCategories.includes(img.category));
+    const newLength = currentFilteredImages.length;
+
+    if (!carouselRef.current) {
+        return;
+    }
+
+    let effectiveIndex = currentIndex;
+    if (newLength === 0) {
+        if (currentIndex !== 0) setCurrentIndex(0); 
+        effectiveIndex = 0;
+    } else if (currentIndex >= newLength) {
+        effectiveIndex = Math.max(0, newLength - 1);
+        setCurrentIndex(effectiveIndex);
+    }
 
     requestAnimationFrame(() => {
-      const items = carouselRef.current?.children;
-      if (!items || items.length !== filteredImages.length) return;
+        if (!carouselRef.current) return;
+        const items = carouselRef.current.children;
+        
+        if (items.length !== newLength) {
+             // Enable this console log for debugging
+             console.warn(`Positioning rAF: Mismatch! DOM items (${items.length}) vs Filtered (${newLength}).`);
+             return; 
+        }
+        
+        if (newLength === 0) { 
+             return;
+        }
 
-      const total = filteredImages.length;
+        const total = newLength;
+        for (let i = 0; i < total; i++) {
+            const item = items[i];
+            if (!item) continue;
 
-      for (let i = 0; i < total; i++) {
-        const item = items[i];
-        if (!item) continue;
+            item.className = 'carousel-item';
+            let pos = (i - effectiveIndex + total) % total;
+            if (pos > Math.floor(total / 2)) pos -= total;
 
-        item.className = 'carousel-item';
-        let pos = (i - currentIndex + total) % total;
-        if (pos > Math.floor(total / 2)) pos -= total;
-
-        if (pos === 0) item.classList.add('active');
-        else if (pos === -1 || (total < 3 && pos === total - 1)) item.classList.add('prev');
-        else if (pos === 1 || (total < 3 && pos === -(total - 1))) item.classList.add('next');
-        else if (pos === -2) item.classList.add('prev-2');
-        else if (pos === 2) item.classList.add('next-2');
-        else if (pos <= -3) item.classList.add('prev-3');
-        else if (pos >= 3) item.classList.add('next-3');
-      }
+            if (pos === 0) item.classList.add('active');
+            else if (pos === -1 || (total < 3 && pos === total - 1)) item.classList.add('prev');
+            else if (pos === 1 || (total < 3 && pos === -(total - 1))) item.classList.add('next');
+            else if (pos === -2) item.classList.add('prev-2');
+            else if (pos === 2) item.classList.add('next-2');
+            else if (pos <= -3) item.classList.add('prev-3');
+            else if (pos >= 3) item.classList.add('next-3');
+        }
     });
-  }, [currentIndex, filteredImages]);
+}, [currentIndex, allImages, activeCategories]); // Keep dependencies
 
   const handleDrop = (e) => {
     e.preventDefault();
     const src = e.dataTransfer.getData('src');
-
+    
     if (src && !outfit.includes(src)) {
-      const index = allImages.findIndex(item => item.src === src);
-      if (index !== -1) {
-        const image = allImages[index];
+        // Add to outfit
         setOutfit(prev => [...prev, src]);
-        setAllImages(prev => {
-          const updated = [...prev];
-          updated.splice(index, 1);
-          return updated;
-        });
+        
+        // Remove from allImages
+        setAllImages(prev => prev.filter(item => item.src !== src));
+        
+        // Force reset carousel position and re-render the entire carousel
         setCurrentIndex(0);
-      }
+        setCarouselKey(prev => prev + 1);
     }
   };
 
@@ -200,24 +266,50 @@ const Carousel = () => {
   };
 
   const removeFromOutfit = (src) => {
-    // Try to determine category from the image or source
     let categoryGuess;
-    
-    const matchingOriginalImage = initialImages.find(img => img.src === src);
-    if (matchingOriginalImage) {
-      categoryGuess = matchingOriginalImage.category;
+    // Attempt to find the *original* item data if it came from the fetched list
+    const originalItem = allImages.find(img => img.src === src) || initialImages.find(img => img.src === src);
+
+    if (originalItem) {
+        categoryGuess = originalItem.category;
     } else {
-      // Make a best guess based on the source
-      categoryGuess = src.includes('shorts') ? 'Shorts' :
-                      src.includes('pants') ? 'Pants' :
-                      src.includes('jacket') ? 'Jackets' :
-                      src.includes('boots') ? 'Shoes' :
-                      src.includes('hat') ? 'Hats' : 'Other';
+        // Fallback category guessing
+        categoryGuess = src.includes('shorts') ? 'Shorts' :
+                        src.includes('pants') ? 'Pants' :
+                        src.includes('jacket') ? 'Jackets' :
+                        src.includes('boots') ? 'Shoes' :
+                        src.includes('hat') ? 'Hats' : 'Other';
+    }
+    
+    console.log(`Removing from outfit: ${src.substring(0, 20)}..., Category: ${categoryGuess}`);
+    
+    // First ensure the category is active so item will be visible
+    if (!activeCategories.includes(categoryGuess)) {
+      console.log(`Activating category ${categoryGuess} to make item visible`);
+      setActiveCategories(prev => [...prev, categoryGuess]);
     }
 
+    // Remove from outfit
     setOutfit(prev => prev.filter(item => item !== src));
-    setAllImages(prev => [...prev, { src, category: categoryGuess }]);
-    setCurrentIndex(0);
+    
+    // Add the item back to allImages and ensure it appears at the front
+    const newItem = { 
+      src, 
+      category: categoryGuess, 
+      id: `returned-${Date.now()}-${Math.random().toString(36).substring(2, 9)}` 
+    };
+    
+    console.log(`Adding back to carousel with ID: ${newItem.id}`);
+    
+    // First add the new item, then reset state to ensure carousel rebuilds
+    setAllImages(prev => [newItem, ...prev]);
+    
+    // Reset carousel to show the returned item (index 0)
+    setTimeout(() => {
+      setCurrentIndex(0);
+      setCarouselKey(prev => prev + 1);
+      console.log('Carousel reset to show returned item');
+    }, 0);
   };
 
   // Loading and error states
@@ -251,34 +343,29 @@ const Carousel = () => {
         {filteredImages.length === 0 ? (
           <div className="no-images-message">No images found for selected categories</div>
         ) : (
-          <div className="carousel-container">
-            <button className="carousel-arrow left" onClick={prevSlide}>&larr;</button>
+          <div className={`carousel-container ${zoomedImg ? 'zoomed-active' : ''}`} key={carouselKey}>
+            {!zoomedImg && <button className="carousel-arrow left" onClick={prevSlide}>&larr;</button>}
             <div className="carousel" ref={carouselRef}>
-              <AnimatePresence mode="wait">
-                {filteredImages.map((img, i) => (
-                  <motion.div
-                    className="carousel-item"
-                    key={i}
-                    drag="x"
-                    dragConstraints={{ left: 0, right: 0 }}
-                    onClick={() => setZoomedImg(img.src)}
-                  >
-                    <div
+              {filteredImages.map((img, i) => (
+                <div className="carousel-item" key={img.id}>
+                  <div className="carousel-item-content">
+                    <div 
+                      className="image-wrapper"
                       onDragStart={(e) => handleDragStart(e, img.src)}
-                      draggable
-                      style={{ width: '100%', height: '100%' }}
+                      draggable={!zoomedImg}
                     >
                       <img
                         src={img.src}
                         alt={`${img.category} item`}
-                        style={{ width: '100%', height: '100%', pointerEvents: 'none' }}
+                        onClick={() => handleImageClick(img.src, i)}
+                        className="carousel-image"
                       />
                     </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+                  </div>
+                </div>
+              ))}
             </div>
-            <button className="carousel-arrow right" onClick={nextSlide}>&rarr;</button>
+            {!zoomedImg && <button className="carousel-arrow right" onClick={nextSlide}>&rarr;</button>}
           </div>
         )}
       </div>
@@ -298,8 +385,10 @@ const Carousel = () => {
       </div>
 
       {zoomedImg && (
-        <div className="modal" onClick={() => setZoomedImg(null)}>
-          <img src={zoomedImg} className="zoomed-img" alt="zoomed" />
+        <div className="zoomed-overlay" onClick={closeZoom}>
+          <div className="zoomed-container" onClick={(e) => e.stopPropagation()}>
+            <img src={zoomedImg} alt="Enlarged view" className="zoomed-image" />
+          </div>
         </div>
       )}
     </div>
