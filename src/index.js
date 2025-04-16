@@ -3,7 +3,9 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LoginFeature from './loginfeature';
 import SignupFeature from './signupfeature';
-import Dashboard from './dashboard'; // ✅ Import Dashboard
+import Dashboard from './dashboard';
+import UploadImage from './UploadImage';
+import AllItemsPage from './AllItemsPage';
 import { AudioProvider } from './AudioContext';
 import './loginfeature.css';
 
@@ -17,7 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         <Routes>
                             <Route path="/" element={<LoginFeature />} />
                             <Route path="/signup" element={<SignupFeature />} />
-                            <Route path="/dashboard" element={<Dashboard />} /> {/* ✅ New route */}
+                            <Route path="/dashboard" element={<Dashboard />} />
+                            <Route path="/upload-image" element={<UploadImage />} />
+                            <Route path="/all-items" element={<AllItemsPage />} />
                         </Routes>
                     </BrowserRouter>
                 </AudioProvider>
