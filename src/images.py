@@ -182,12 +182,19 @@ def get_all_images(username):
 
     result = []
     for img in user_images:
-        encoded = base64.b64encode(img["image_data"]).decode("utf-8")
-        result.append({
-            "image_id": img["image_id"],
-            "description": img["image_description"],
-            "outfit_number": img["outfit_number"],
-            "base64": f"data:image/png;base64,{encoded}"
-        })
+        # Check if image_data exists
+        if "image_data" in img:
+            try:
+                encoded = base64.b64encode(img["image_data"]).decode("utf-8")
+                result.append({
+                    "id": img["image_id"],
+                    "category": img["image_description"],
+                    "outfit_numbers": img.get("outfit_numbers", []),
+                    "base64": f"data:image/png;base64,{encoded}"
+                })
+            except Exception as e:
+                print(f"Error processing image: {e}")
+        else:
+            print(f"Image data not found for record: {img.get('image_id', 'unknown')}")
 
     return result

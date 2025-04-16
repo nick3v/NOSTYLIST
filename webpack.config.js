@@ -1,10 +1,10 @@
-const path = require('path');
+import path from 'path';
 
-module.exports = {
+export default {
   mode: 'development',
   entry: './src/index.js',
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(process.cwd(), 'dist'),
     filename: 'bundle.js',
     publicPath: '/'
   },
@@ -27,16 +27,27 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.js', '.jsx']
+    extensions: ['.js', '.jsx', '.json'],
+    extensionAlias: {
+      '.js': ['.js', '.jsx']
+    }
   },
   devServer: {
     static: {
-      directory: path.join(__dirname, 'public'),
+      directory: path.join(process.cwd(), 'public'),
     },
-    port: 3000,
+    port: 3002,
     open: true,
     hot: true,
     historyApiFallback: true,
+    proxy: [
+      {
+        context: ['/api'],
+        target: 'http://localhost:5001',
+        secure: false,
+        changeOrigin: true
+      }
+    ],
     devMiddleware: {
       publicPath: '/'
     }

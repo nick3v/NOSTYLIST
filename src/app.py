@@ -16,7 +16,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__) 
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+# Enable CORS with more specific configuration
+CORS(app, resources={r"/api/*": {"origins": "*", "methods": ["GET", "POST", "OPTIONS"], "allow_headers": ["Content-Type", "Authorization"]}})
 
 
 @app.route('/api/auth/login', methods=['POST'])
@@ -67,7 +68,13 @@ def get_user(user_id):
 # Discards outfit and deletes all images associated with the outfit
 def delete_outfit(user_id, outfit_num):
     result = users.get_user_by_id(user_id)
-    username = result["username"]
+    if not result["success"]:
+        logger.error(f"User not found for ID: {user_id}")
+        return {"success": False, "message": "User not found"}
+        
+    # Extract username from the user object in the result
+    username = result["user"]["username"]
+    logger.info(f"Deleting outfit {outfit_num} for user: {username}")
     result = outfits.discard_outfit(username, outfit_num)
 
     for j in range(0, 4):
@@ -92,7 +99,8 @@ def get_all_clothing_items(user_id):
     if not result["success"]:
         return jsonify({"success": False, "message": "User not found"}), 404
 
-    username = result["username"]
+    # Extract username from the user object in the result
+    username = result["user"]["username"]
     all_items = images.get_all_images(username)
 
     return jsonify({"success": True, "items": all_items}), 200
@@ -133,7 +141,9 @@ def upload_image():
         if not user_result["success"]:
             return jsonify({"success": False, "message": "User not found"}), 404
 
-        username = user_result["username"]
+        # Extract username from the user object in user_result
+        username = user_result["user"]["username"]
+        logger.info(f"Found username: {username} for user ID: {user_id}")
 
         # Process the image with outline-based cropping
         # Save the uploaded image to a temporary file
@@ -149,7 +159,7 @@ def upload_image():
                 img = img.convert('RGBA')
 
             # Load the appropriate outline image
-            outline_path = os.path.join(os.path.dirname(__file__), 'public', f'{category}.png')
+            outline_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'public', f'{category}.png')
 
             # If outline exists, use it for masking
             if os.path.exists(outline_path):
@@ -281,30 +291,42 @@ def crop_image():
     logger.info("Crop image endpoint called")
 
     # Debug request info
-    logger.debug("Request content type: %s", request.content_type)
-    logger.debug("Request form: %s", request.form)
-    logger.debug("Request files: %s", request.files.keys())
+    logger.info("Request content type: %s", request.content_type)
+    logger.info("Request form keys: %s", list(request.form.keys()) if request.form else "None")
+    logger.info("Request files keys: %s", list(request.files.keys()) if request.files else "None")
 
     try:
         # Get form data
         user_id = request.form.get('userId')
         category = request.form.get('category')
         image_file = request.files.get('image')
+        
+        logger.info(f"Received request with userId: {user_id}, category: {category}, image: {'Yes' if image_file else 'No'}")
 
         # Get scale and position data
         scale = float(request.form.get('scale', 1.0))
         offset_x = int(request.form.get('offsetX', 0))
         offset_y = int(request.form.get('offsetY', 0))
+        
+        logger.info(f"Scale: {scale}, offsets: ({offset_x}, {offset_y})")
 
         if not user_id or not category or not image_file:
-            return jsonify({"success": False, "message": "Missing required data"}), 400
+            missing = []
+            if not user_id: missing.append("userId")
+            if not category: missing.append("category")
+            if not image_file: missing.append("image")
+            error_msg = f"Missing required data: {', '.join(missing)}"
+            logger.error(error_msg)
+            return jsonify({"success": False, "message": error_msg}), 400
 
         # Validate category
         valid_categories = ['hat', 'shirt', 'pant', 'shoe', 'long sleeve', 'shorts']
 
         # Map the category to what the database expects
         if category not in valid_categories:
-            return jsonify({"success": False, "message": "Invalid category"}), 400
+            error_msg = f"Invalid category: {category}. Valid options are: {', '.join(valid_categories)}"
+            logger.error(error_msg)
+            return jsonify({"success": False, "message": error_msg}), 400
 
         # Map categories to our database format
         category_mapping = {
@@ -323,7 +345,9 @@ def crop_image():
         if not user_result["success"]:
             return jsonify({"success": False, "message": "User not found"}), 404
 
-        username = user_result["username"]
+        # Extract username from the user object in user_result
+        username = user_result["user"]["username"]
+        logger.info(f"Found username: {username} for user ID: {user_id}")
 
         # Process the image for cropping
         with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
@@ -370,8 +394,8 @@ def crop_image():
             elif category == 'shorts':
                 outline_filename = 'shortsOutline.png'
 
-            # Create the mask from the outline
-            outline_path = os.path.join(os.path.dirname(__file__), 'public', outline_filename)
+            # Use the correct path to the public directory
+            outline_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'public', outline_filename)
 
             if os.path.exists(outline_path):
                 # Load the outline image
@@ -458,9 +482,11 @@ def crop_image():
             # Clean up in case of error
             if os.path.exists(temp_path):
                 os.unlink(temp_path)
+            logger.error(f"Error processing image: {str(e)}")
             return jsonify({"success": False, "message": f"Error processing image: {str(e)}"}), 500
 
     except Exception as e:
+        logger.error(f"Error in crop_image endpoint: {str(e)}")
         return jsonify({"success": False, "message": f"Error: {str(e)}"}), 500
 
 @app.route('/api/test')

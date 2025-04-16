@@ -155,7 +155,8 @@ const UploadImage = () => {
     // Test the API connection
     const testApiConnection = async () => {
         try {
-            const response = await fetch('/api/test');
+            // Use absolute URL to match the crop-image endpoint
+            const response = await fetch('http://localhost:5001/api/test');
             const data = await response.json();
             console.log('API test response:', data);
             return true;

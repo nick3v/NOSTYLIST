@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import LoginFeature from './loginfeature';
-import SignupFeature from './signupfeature';
-import Dashboard from './dashboard';
-import UploadImage from './UploadImage';
-import AllItemsPage from './AllItemsPage';
-import { AudioProvider } from './AudioContext';
+import LoginFeature from './loginfeature.jsx';
+import SignupFeature from './signupfeature.jsx';
+import Dashboard from './dashboard.jsx';
+import UploadImage from './UploadImage.jsx';
+import AllItemsPage from './AllItemsPage.jsx';
+import { AudioProvider } from './AudioContext.jsx';
 import './loginfeature.css';
 
 document.addEventListener('DOMContentLoaded', () => {
