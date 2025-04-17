@@ -362,8 +362,8 @@ def crop_image():
 
         try:
             # SPECIAL CASE FOR SHORTS: Skip cropping and directly save the original image
-            if category == 'shorts':
-                logger.info("Processing shorts: bypassing cropping process")
+            if category in ['shorts', 'shoe', 'jacket', 'pant', 'hat']:
+                logger.info(f"Processing {category}: bypassing cropping process")
                 
                 # Just load and convert the image to RGBA
                 img = Image.open(temp_path)
@@ -377,12 +377,12 @@ def crop_image():
                 
                 # Save to database
                 binary_data = output.getvalue()
-                logger.info(f"Saving shorts image directly without cropping")
+                logger.info(f"Saving {category} image directly without cropping")
                 try:
                     image_id = images.save_image(username, db_category, binary_data)
-                    logger.info(f"Successfully saved shorts with ID: {image_id}")
+                    logger.info(f"Successfully saved {category} with ID: {image_id}")
                 except Exception as e:
-                    logger.error(f"Error saving shorts to database: {str(e)}")
+                    logger.error(f"Error saving {category} to database: {str(e)}")
                     raise e
                 
                 # Clean up
@@ -391,7 +391,7 @@ def crop_image():
                 # Return success
                 response = jsonify({
                     "success": True,
-                    "message": "Shorts image saved successfully (no cropping applied)",
+                    "message": f"{category.capitalize()} image saved successfully (no cropping applied)",
                     "imageId": image_id
                 })
                 response.headers.add('Content-Type', 'application/json')
