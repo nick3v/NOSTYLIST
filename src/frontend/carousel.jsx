@@ -290,8 +290,12 @@ useEffect(() => {
     const src = e.dataTransfer.getData('src');
     
     if (src && !outfit.includes(src)) {
-        // Add to outfit
-        setOutfit(prev => [...prev, src]);
+        // Find the original item to get its category
+        const draggedItem = allImages.find(item => item.src === src);
+        if (!draggedItem) return;
+        
+        // Add to outfit with category information
+        setOutfit(prev => [...prev, { src, category: draggedItem.category, id: draggedItem.id }]);
         
         // Remove from allImages
         setAllImages(prev => prev.filter(item => item.src !== src));
@@ -306,38 +310,47 @@ useEffect(() => {
     e.dataTransfer.setData('src', src);
   };
 
-  const removeFromOutfit = (src) => {
-    let categoryGuess;
-    // Attempt to find the *original* item data if it came from the fetched list
-    const originalItem = allImages.find(img => img.src === src) || initialImages.find(img => img.src === src);
+  const removeFromOutfit = (outfitItem) => {
+    // Now outfitItem is an object with src and category properties
+    const { src, category } = typeof outfitItem === 'string' 
+      ? { src: outfitItem, category: null } // Handle old format for backwards compatibility
+      : outfitItem;
+    
+    let categoryToUse = category;
+    
+    // If no category was stored (backwards compatibility), try to guess it
+    if (!categoryToUse) {
+      // Attempt to find the *original* item data if it came from the fetched list
+      const originalItem = allImages.find(img => img.src === src) || initialImages.find(img => img.src === src);
 
-    if (originalItem) {
-        categoryGuess = originalItem.category;
-    } else {
-        // Fallback category guessing for all 6 categories
-        categoryGuess = src.includes('hat') ? 'Hats' :
+      if (originalItem) {
+          categoryToUse = originalItem.category;
+      } else {
+          // Fallback category guessing for all 6 categories
+          categoryToUse = src.includes('hat') ? 'Hats' :
                         src.includes('shoe') || src.includes('boots') ? 'Shoes' :
                         src.includes('shorts') ? 'Shorts' :
                         src.includes('sleeve') ? 'Jacket' :
                         src.includes('shirt') ? 'Shirts' :
                         'Pants'; // Default to pants
+      }
     }
     
-    console.log(`Removing from outfit: ${src.substring(0, 20)}..., Category: ${categoryGuess}`);
+    console.log(`Removing from outfit: ${src.substring(0, 20)}..., Category: ${categoryToUse}`);
     
     // First ensure the category is active so item will be visible
-    if (!activeCategories.includes(categoryGuess)) {
-      console.log(`Activating category ${categoryGuess} to make item visible`);
-      setActiveCategories(prev => [...prev, categoryGuess]);
+    if (!activeCategories.includes(categoryToUse)) {
+      console.log(`Activating category ${categoryToUse} to make item visible`);
+      setActiveCategories(prev => [...prev, categoryToUse]);
     }
 
     // Remove from outfit
-    setOutfit(prev => prev.filter(item => item !== src));
+    setOutfit(prev => prev.filter(item => typeof item === 'string' ? item !== src : item.src !== src));
     
     // Add the item back to allImages and ensure it appears at the front
     const newItem = { 
       src, 
-      category: categoryGuess, 
+      category: categoryToUse, 
       id: `returned-${Date.now()}-${Math.random().toString(36).substring(2, 9)}` 
     };
     
@@ -445,12 +458,15 @@ useEffect(() => {
         onDrop={handleDrop}
       >
         <h2>Your Fit</h2>
-        {outfit.map((src, idx) => (
-          <div key={idx} className="fit-item">
-            <img src={src} alt="fit" />
-            <button className="remove-btn" onClick={() => removeFromOutfit(src)}>✖</button>
-          </div>
-        ))}
+        {outfit.map((item, idx) => {
+          const src = typeof item === 'string' ? item : item.src;
+          return (
+            <div key={idx} className="fit-item">
+              <img src={src} alt="fit" />
+              <button className="remove-btn" onClick={() => removeFromOutfit(item)}>✖</button>
+            </div>
+          );
+        })}
       </div>
 
       {zoomedImg && (
