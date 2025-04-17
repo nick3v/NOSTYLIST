@@ -41,21 +41,49 @@ def image_to_binary():
 def save_image(username, image_description, binary_data, outfit_num=[]):
     # So all entries are lower, need to have a correction in frontend if they misspell
     image_description = image_description.lower()
+    
+    print(f"Starting save_image for user: {username}, category: {image_description}")
+    
+    try:
+        # Find the number of clothing items the user has and update it in the user collection
+        result = user_collection.find_one({"username": username})
+        if not result:
+            print(f"ERROR: User {username} not found in database")
+            raise Exception(f"User {username} not found")
+            
+        # Fix for shorts category - use the correct field name
+        if image_description == "shorts":
+            field_name = "num_shorts"
+        else:
+            field_name = "num_" + image_description + "s"
+            
+        print(f"Looking for field: {field_name} in user document")
+        
+        if field_name not in result:
+            print(f"ERROR: Field {field_name} not found in user document")
+            print(f"Available fields: {list(result.keys())}")
+            raise Exception(f"Field {field_name} not found in user document")
+            
+        num = int(result[field_name])
+        num += 1
+        string_num = str(num)
+        print(f"Incrementing {field_name} from {result[field_name]} to {string_num}")
+        
+        user_collection.update_one(
+            {"username": username},
+            {"$set": {field_name: string_num}}
+        )
 
-    # Find the number of clothing items the user has and update it in the user collection
-    result = user_collection.find_one({"username": username})
-    num = int(result["num_" + image_description + "s"])
-    num += 1
-    string_num = str(num)
-    user_collection.update_one(
-        {"username": username},
-        {"$set": {"num_" + image_description + "s": string_num}}
-    )
-
-    # Insert the image data and metadata into the database
-    document = {"username": username, "outfit_numbers": outfit_num, "image_description": image_description,
-                "image_id": string_num, "image_data": binary_data}
-    collection.insert_one(document)
+        # Insert the image data and metadata into the database
+        document = {"username": username, "outfit_numbers": outfit_num, "image_description": image_description,
+                    "image_id": string_num, "image_data": binary_data}
+        collection.insert_one(document)
+        print(f"Successfully saved {image_description} with ID: {string_num}")
+        
+        return string_num
+    except Exception as e:
+        print(f"ERROR in save_image: {str(e)}")
+        raise
 
 
 # Example code using image_to_binary() and save_image(username, image_description, image_id, outfit_num=[]):
@@ -143,7 +171,7 @@ def get_num_image(username, image_description):
         return get_num_shirts(username)
     elif image_description == "jacket":
         return get_num_jackets(username)
-    elif image_description == "short":
+    elif image_description == "shorts":
         return get_num_shorts(username)
     elif image_description == "pant":
         return get_num_pants(username)

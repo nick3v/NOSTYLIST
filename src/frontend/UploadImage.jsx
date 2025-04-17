@@ -19,7 +19,7 @@ const UploadImage = () => {
     const canvasRef = useRef(null);
     const outlineImgRef = useRef(null);
 
-    const categories = ['hat', 'shirt', 'pant', 'shoe', 'long sleeve', 'shorts'];
+    const categories = ['hat', 'shirt', 'pant', 'shoe', 'jacket', 'shorts'];
 
     // Handle file selection
     const handleFileChange = (e) => {
@@ -106,7 +106,7 @@ const UploadImage = () => {
             // Map category to correct filename
             let outlineFile = '';
             if (category === 'hat') outlineFile = 'hatOutline.png';
-            else if (category === 'long sleeve') outlineFile = 'longOutline.png';
+            else if (category === 'jacket') outlineFile = 'longOutline.png';
             else if (category === 'pant') outlineFile = 'pantsOutline.png';
             else if (category === 'shirt') outlineFile = 'shirtOutline.png';
             else if (category === 'shoe') outlineFile = 'shoesOutline.png';

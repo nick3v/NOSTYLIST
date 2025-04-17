@@ -6,11 +6,11 @@ import './carousel.css';
 const initialImages = [
   { src: '/rick shorts.jpg', category: 'Shorts' },
   { src: '/rick pants.jpg', category: 'Pants' },
-  { src: '/rick jacket.jpg', category: 'Long Sleeves' },
+  { src: '/rick jacket.jpg', category: 'Jacket' },
   { src: '/rick shorts.jpg', category: 'Shorts' },
   { src: '/shirt.jpg', category: 'Shirts' },
   { src: '/rick pants.jpg', category: 'Pants' },
-  { src: '/long sleeve.jpg', category: 'Long Sleeves' },
+  { src: '/long sleeve.jpg', category: 'Jacket' },
   { src: '/carti hat.jpg', category: 'Hats' },
   { src: '/rick boots.jpg', category: 'Shoes' }
 ];
@@ -21,12 +21,13 @@ const categoryMapping = {
   'shirt': 'Shirts',
   'pant': 'Pants',
   'shoe': 'Shoes',
-  'long sleeve': 'Long Sleeves',
+  'jacket': 'Jacket',
+  'long sleeve': 'Jacket',
   'shorts': 'Shorts'
 };
 
 // UI categories for filtering - match exactly with the categoryMapping values
-const categories = ['Hats', 'Shirts', 'Pants', 'Shorts', 'Long Sleeves', 'Shoes'];
+const categories = ['Hats', 'Shirts', 'Pants', 'Shorts', 'Jacket', 'Shoes'];
 
 const Carousel = () => {
   const carouselRef = useRef(null);
@@ -317,7 +318,7 @@ useEffect(() => {
         categoryGuess = src.includes('hat') ? 'Hats' :
                         src.includes('shoe') || src.includes('boots') ? 'Shoes' :
                         src.includes('shorts') ? 'Shorts' :
-                        src.includes('sleeve') ? 'Long Sleeves' :
+                        src.includes('sleeve') ? 'Jacket' :
                         src.includes('shirt') ? 'Shirts' :
                         'Pants'; // Default to pants
     }
@@ -386,7 +387,7 @@ useEffect(() => {
               case 'Shorts':
                 buttonIcon = '🩳 ';
                 break;
-              case 'Long Sleeves':
+              case 'Jacket':
                 buttonIcon = '🧥 ';
                 break;
               case 'Shoes':

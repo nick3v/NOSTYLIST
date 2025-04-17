@@ -136,3 +136,52 @@ def get_user_by_id(user_id):
         # Example usage:
     # result = get_user_by_id("66d563e1e5b58d4a8b75a33d")
     # print(JordanCarter29)
+
+# Add a migration function to ensure all users have the required fields
+def ensure_user_fields():
+    """
+    Ensures all user documents in the database have all required fields.
+    This is especially important after schema changes.
+    """
+    try:
+        # Fields that should be present in every user document with default values
+        required_fields = {
+            "num_outfits": "0",
+            "num_hats": "0",
+            "num_shirts": "0",
+            "num_jackets": "0",
+            "num_shorts": "0",  # This field was missing
+            "num_pants": "0",
+            "num_shoes": "0"
+        }
+        
+        # Get all users
+        users = collection.find({})
+        update_count = 0
+        
+        for user in users:
+            update_needed = False
+            updates = {}
+            
+            # Check if each required field exists
+            for field, default_value in required_fields.items():
+                if field not in user:
+                    updates[field] = default_value
+                    update_needed = True
+            
+            # Update the user if needed
+            if update_needed:
+                collection.update_one(
+                    {"_id": user["_id"]},
+                    {"$set": updates}
+                )
+                update_count += 1
+        
+        print(f"Updated {update_count} user(s) with missing fields")
+        return {"success": True, "updated_count": update_count}
+    except Exception as e:
+        print(f"Error in ensure_user_fields: {str(e)}")
+        return {"success": False, "message": str(e)}
+
+# Run the migration function when this module is imported
+ensure_user_fields()

@@ -118,7 +118,7 @@ def upload_image():
             return jsonify({"success": False, "message": "Missing required data"}), 400
 
         # Validate category
-        valid_categories = ['hat', 'shirt', 'pant', 'shoe', 'long sleeve', 'shorts']
+        valid_categories = ['hat', 'shirt', 'pant', 'shoe', 'jacket', 'shorts']
 
         # Map the category to what the database expects
         if category not in valid_categories:
@@ -129,8 +129,8 @@ def upload_image():
             'hat': 'hat',
             'shirt': 'shirt',
             'pant': 'pant',
-            'long sleeve': 'shirt',  # We'll map long sleeve to shirt
-            'shorts': 'pant',  # We'll map shorts to pant
+            'jacket': 'jacket',  # Keep jacket as jacket
+            'shorts': 'shorts',  # Map shorts to shorts
             'shoe': 'shoe'
         }
 
@@ -200,7 +200,13 @@ def upload_image():
 
                 # Save image to the database
                 binary_data = output.getvalue()
-                images.save_image(username, db_category, binary_data)
+                logger.info(f"Attempting to save image with category: {category}, db_category: {db_category}")
+                try:
+                    image_id = images.save_image(username, db_category, binary_data)
+                    logger.info(f"Successfully saved image with ID: {image_id}")
+                except Exception as e:
+                    logger.error(f"Error saving image to database: {str(e)}")
+                    raise e  # Re-raise to be caught by outer exception handler
 
                 # Clean up the temporary file
                 os.unlink(temp_path)
@@ -320,7 +326,7 @@ def crop_image():
             return jsonify({"success": False, "message": error_msg}), 400
 
         # Validate category
-        valid_categories = ['hat', 'shirt', 'pant', 'shoe', 'long sleeve', 'shorts']
+        valid_categories = ['hat', 'shirt', 'pant', 'shoe', 'jacket', 'shorts']
 
         # Map the category to what the database expects
         if category not in valid_categories:
@@ -333,8 +339,8 @@ def crop_image():
             'hat': 'hat',
             'shirt': 'shirt',
             'pant': 'pant',
-            'long sleeve': 'shirt',  # We'll map long sleeve to shirt
-            'shorts': 'pant',  # We'll map shorts to pant
+            'jacket': 'jacket',  # Keep jacket as jacket
+            'shorts': 'shorts',  # Map shorts to shorts
             'shoe': 'shoe'
         }
 
@@ -349,12 +355,49 @@ def crop_image():
         username = user_result["user"]["username"]
         logger.info(f"Found username: {username} for user ID: {user_id}")
 
-        # Process the image for cropping
+        # Save the uploaded image to a temporary file
         with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
             image_file.save(temp_file.name)
             temp_path = temp_file.name
 
         try:
+            # SPECIAL CASE FOR SHORTS: Skip cropping and directly save the original image
+            if category == 'shorts':
+                logger.info("Processing shorts: bypassing cropping process")
+                
+                # Just load and convert the image to RGBA
+                img = Image.open(temp_path)
+                if img.mode != 'RGBA':
+                    img = img.convert('RGBA')
+                
+                # Save image to memory
+                output = BytesIO()
+                img.save(output, format='PNG')
+                output.seek(0)
+                
+                # Save to database
+                binary_data = output.getvalue()
+                logger.info(f"Saving shorts image directly without cropping")
+                try:
+                    image_id = images.save_image(username, db_category, binary_data)
+                    logger.info(f"Successfully saved shorts with ID: {image_id}")
+                except Exception as e:
+                    logger.error(f"Error saving shorts to database: {str(e)}")
+                    raise e
+                
+                # Clean up
+                os.unlink(temp_path)
+                
+                # Return success
+                response = jsonify({
+                    "success": True,
+                    "message": "Shorts image saved successfully (no cropping applied)",
+                    "imageId": image_id
+                })
+                response.headers.add('Content-Type', 'application/json')
+                return response, 200
+            
+            # For all other categories, continue with normal cropping process
             # Load the image and convert to RGBA
             img = Image.open(temp_path)
             if img.mode != 'RGBA':
@@ -383,7 +426,7 @@ def crop_image():
             outline_filename = ''
             if category == 'hat':
                 outline_filename = 'hatOutline.png'
-            elif category == 'long sleeve':
+            elif category == 'jacket':
                 outline_filename = 'longOutline.png'
             elif category == 'pant':
                 outline_filename = 'pantsOutline.png'
@@ -449,7 +492,7 @@ def crop_image():
                     draw.pieslice([125, 50, 275, 125], start=0, end=180, fill=255)
                 elif category in ['pant', 'shorts']:
                     draw.rectangle([100, 200, 300, 375], fill=255)
-                elif category in ['shirt', 'long sleeve']:
+                elif category in ['shirt', 'jacket']:
                     draw.ellipse([100, 100, 300, 250], fill=255)
                 elif category == 'shoe':
                     draw.ellipse([125, 300, 275, 375], fill=255)
@@ -464,7 +507,13 @@ def crop_image():
 
             # Save image to the database
             binary_data = output.getvalue()
-            image_id = images.save_image(username, db_category, binary_data)
+            logger.info(f"Attempting to save image with category: {category}, db_category: {db_category}")
+            try:
+                image_id = images.save_image(username, db_category, binary_data)
+                logger.info(f"Successfully saved image with ID: {image_id}")
+            except Exception as e:
+                logger.error(f"Error saving image to database: {str(e)}")
+                raise e  # Re-raise to be caught by outer exception handler
 
             # Clean up the temporary file
             os.unlink(temp_path)
