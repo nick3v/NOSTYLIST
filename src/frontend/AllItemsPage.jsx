@@ -97,20 +97,22 @@ const AllItemsPage = () => {
           </button>
         </div>
       ) : (
-        <section className="items-gallery">
-          {items.map((item, index) => (
-            <div key={index} className="gallery-item-wrapper">
-              <div className="gallery-item-image-container">
-                <img
-                  src={item.base64}
-                  alt={item.description || `Clothing ${index}`}
-                  className="gallery-item"
-                />
+        <div className="items-container">
+          <section className="items-gallery">
+            {items.map((item, index) => (
+              <div key={index} className="gallery-item-wrapper">
+                <div className="gallery-item-image-container">
+                  <img
+                    src={item.base64}
+                    alt={item.description || `Clothing ${index}`}
+                    className="gallery-item"
+                  />
+                </div>
+                <div className="item-category">{item.category || item.description}</div>
               </div>
-              <div className="item-category">{item.category || item.description}</div>
-            </div>
-          ))}
-        </section>
+            ))}
+          </section>
+        </div>
       )}
     </div>
   );

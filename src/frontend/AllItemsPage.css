@@ -6,6 +6,9 @@
   background: black;
   color: white;
   font-family: 'Kantumruy Pro', sans-serif;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .all-items-header {
@@ -42,12 +45,23 @@
   border-color: white;
 }
 
+.items-container {
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
 .items-gallery {
   display: flex;
   flex-wrap: wrap;
   gap: 30px;
   justify-content: center;
   padding: 20px;
+  overflow-y: auto;
+  max-height: calc(100vh - 200px);
+  width: 100%;
 }
 
 .gallery-item-wrapper {
@@ -160,6 +174,7 @@
   .items-gallery {
     gap: 20px;
     padding: 10px;
+    max-height: calc(100vh - 180px);
   }
   
   .gallery-item-wrapper {
