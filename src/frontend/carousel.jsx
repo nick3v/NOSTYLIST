@@ -40,6 +40,8 @@ const Carousel = () => {
   const [zoomedImg, setZoomedImg] = useState(null);
   const intervalRef = useRef(null);
   const [carouselKey, setCarouselKey] = useState(0);
+  const [savingOutfit, setSavingOutfit] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
 
   // Fetch images from the backend when component mounts
   useEffect(() => {
@@ -367,6 +369,126 @@ useEffect(() => {
     }, 0);
   };
 
+  const saveOutfit = async () => {
+    // If there's no outfit or we're already saving, don't proceed
+    if (outfit.length === 0 || savingOutfit) return;
+    
+    setSavingOutfit(true);
+    setSaveMessage('');
+    
+    try {
+      // Get user ID from localStorage
+      const userId = localStorage.getItem('userId');
+      
+      if (!userId) {
+        setSaveMessage('You need to be logged in to save outfits');
+        setSavingOutfit(false);
+        return;
+      }
+      
+      // Create a full outfit array with 6 items (hat, shirt, jacket, shorts, pants, shoes)
+      // If an item is missing, use null
+      const outfitItems = Array(6).fill(null);
+      
+      // Map each item to its correct position based on category
+      outfit.forEach(item => {
+        const category = typeof item === 'string' 
+          ? null // We can't determine category from string alone
+          : item.category;
+          
+        let index = -1;
+        if (category === 'Hats') index = 0; // Hat
+        else if (category === 'Shirts') index = 1; // Shirt
+        else if (category === 'Jacket') index = 2; // Jacket
+        else if (category === 'Shorts') index = 3; // Shorts
+        else if (category === 'Pants') index = 4; // Pants
+        else if (category === 'Shoes') index = 5; // Shoes
+        
+        if (index !== -1) {
+          outfitItems[index] = item;
+        }
+      });
+      
+      // Send the outfit to the backend
+      const response = await fetch('/api/save-outfit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          outfitItems,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setSaveMessage('Fit saved successfully!');
+        
+        // Return all outfit items to the carousel
+        const itemsToReturn = [...outfit];
+        
+        // Clear the outfit
+        setOutfit([]);
+        
+        // Return items to carousel one by one
+        itemsToReturn.forEach(item => {
+          const { src, category } = typeof item === 'string' 
+            ? { src: item, category: null } 
+            : item;
+            
+          let categoryToUse = category;
+          
+          if (!categoryToUse) {
+            // Try to guess category from src if needed (same logic as in removeFromOutfit)
+            categoryToUse = src.includes('hat') ? 'Hats' :
+                          src.includes('shoe') || src.includes('boots') ? 'Shoes' :
+                          src.includes('shorts') ? 'Shorts' :
+                          src.includes('sleeve') ? 'Jacket' :
+                          src.includes('shirt') ? 'Shirts' :
+                          'Pants';
+          }
+          
+          // Add item back to allImages
+          const newItem = { 
+            src, 
+            category: categoryToUse, 
+            id: `returned-${Date.now()}-${Math.random().toString(36).substring(2, 9)}` 
+          };
+          
+          setAllImages(prev => [newItem, ...prev]);
+        });
+        
+        // Reset carousel position
+        setCurrentIndex(0);
+        setCarouselKey(prev => prev + 1);
+        
+        // Clear save message after 3 seconds
+        setTimeout(() => {
+          setSaveMessage('');
+        }, 3000);
+      } else {
+        // Show a more user-friendly error message
+        if (data.message && data.message.includes("'NoneType' object is not subscriptable")) {
+          setSaveMessage("Error: One of your items couldn't be found in the database. Try adding the items again.");
+        } else {
+          setSaveMessage(`Error: ${data.message || 'Failed to save fit'}`);
+        }
+      }
+    } catch (err) {
+      console.error('Error saving outfit:', err);
+      // Show a more user-friendly error message for common errors
+      if (err.message && err.message.includes('Failed to fetch')) {
+        setSaveMessage("Error: Couldn't connect to the server. Please check your connection.");
+      } else {
+        setSaveMessage(`Error: ${err.message || 'Failed to save fit'}`);
+      }
+    } finally {
+      setSavingOutfit(false);
+    }
+  };
+
   // Loading and error states
   if (loading && allImages.length === 0) {
     return <div className="dashboard-container"><div className="loading">Loading images...</div></div>;
@@ -467,6 +589,23 @@ useEffect(() => {
             </div>
           );
         })}
+        
+        {outfit.length > 0 && (
+          <div className="fit-actions">
+            <button 
+              className={`save-fit-btn ${savingOutfit ? 'saving' : ''}`}
+              onClick={saveOutfit}
+              disabled={savingOutfit}
+            >
+              {savingOutfit ? 'Saving...' : 'Save Fit'}
+            </button>
+            {saveMessage && (
+              <div className={`save-message ${saveMessage.includes('Error') ? 'error' : 'success'}`}>
+                {saveMessage}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {zoomedImg && (

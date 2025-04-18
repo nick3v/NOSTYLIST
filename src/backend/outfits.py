@@ -52,8 +52,17 @@ def create_outfit(username, outfit):
         else:
             image_description = "shoe"
             image_id = str(outfit[5])
+            
+        # Skip placeholder images (id -1) or missing images
+        if image_id == "-1":
+            continue
+            
         result3 = image_collection.find_one({"username": username, "image_description": image_description,
                                              "image_id": image_id})
+        # Skip if the image doesn't exist in the database
+        if result3 is None:
+            continue
+            
         outfit_nums = result3["outfit_numbers"]
         outfit_nums.append(string_num)
         image_collection.update_one({"username": username, "image_description": image_description, "image_id": image_id}

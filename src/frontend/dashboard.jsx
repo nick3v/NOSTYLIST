@@ -15,7 +15,7 @@ const Dashboard = () => {
                     <button>Profile</button>
                     <button onClick={() => navigate('/upload-image')}>Upload Image</button>
                     <button onClick={() => navigate('/all-items')}>Show All Items</button>
-                    <button>Previous Fits</button>
+                    <button onClick={() => navigate('/previous-fits')}>Previous Fits</button>
                     <button>Logout</button>
                 </nav>
             </aside>

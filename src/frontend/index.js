@@ -6,6 +6,8 @@ import SignupFeature from './signupfeature.jsx';
 import Dashboard from './dashboard.jsx';
 import UploadImage from './UploadImage.jsx';
 import AllItemsPage from './AllItemsPage.jsx';
+import PreviousFits from './PreviousFits.jsx';
+import TestPage from './TestPage.jsx';
 import { AudioProvider } from './AudioContext.jsx';
 import './loginfeature.css';
 
@@ -22,6 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             <Route path="/dashboard" element={<Dashboard />} />
                             <Route path="/upload-image" element={<UploadImage />} />
                             <Route path="/all-items" element={<AllItemsPage />} />
+                            <Route path="/previous-fits" element={<PreviousFits />} />
+                            <Route path="/test" element={<TestPage />} />
                         </Routes>
                     </BrowserRouter>
                 </AudioProvider>

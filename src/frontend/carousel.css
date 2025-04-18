@@ -261,6 +261,57 @@
   font-family: 'Kantumruy Pro', sans-serif;
 }
 
+/* Save fit button and message styles */
+.fit-actions {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.save-fit-btn {
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: 'Kantumruy Pro', sans-serif;
+  transition: all 0.2s ease;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.save-fit-btn:hover {
+  background: #f0f0f0;
+  transform: translateY(-2px);
+}
+
+.save-fit-btn.saving {
+  background: #cccccc;
+  cursor: not-allowed;
+}
+
+.save-message {
+  margin-top: 12px;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  text-align: center;
+  width: 100%;
+}
+
+.save-message.success {
+  background: rgba(0, 200, 0, 0.2);
+  color: #00ff00;
+}
+
+.save-message.error {
+  background: rgba(255, 0, 0, 0.2);
+  color: #ff5555;
+}
+
 /* === MODAL === */
 .modal {
   position: fixed;
