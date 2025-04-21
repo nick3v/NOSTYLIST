@@ -139,7 +139,11 @@ def delete_image(username, image_description, image_id, outfit_num=[]):
     if len(outfit_num) > 0:
         for i in range(len(outfit_num)):
             # Update outfit collection
-            outfit_collection.update_one({"username": username, "outfit_number": outfit_num[i]},
+            if image_description == "shorts":
+                outfit_collection.update_one({"username": username, "outfit_number": outfit_num[i]},
+                                             {"$set": {"short_id": "-1"}})
+            else:
+                outfit_collection.update_one({"username": username, "outfit_number": outfit_num[i]},
                                          {"$set": {image_description + "_id": "-1"}})
             # -1 will represent an id of blank stock clothing item image already stored in mongo
 
@@ -156,7 +160,11 @@ def delete_image(username, image_description, image_id, outfit_num=[]):
     # Decrement total number of image_descriptions e.g. number of hats, shirts, etc. in user collection
     num_image -= 1
     string_num = str(num_image)
-    user_collection.update_one({"username": username}, {"$set": {"num_" + image_description + "s": string_num}})
+    if image_description != "shorts":
+        user_collection.update_one({"username": username}, {"$set": {"num_" + image_description + "s": string_num}})
+    else:
+        user_collection.update_one({"username": username}, {"$set": {"num_shorts": string_num}})
+    return True
 
 
 # Example code using delete_image(username, image_description, image_id, outfit_num=[]):
@@ -246,3 +254,23 @@ def get_all_images(username):
             print(f"Image data not found for record: {img.get('image_id', 'unknown')}")
 
     return result
+
+
+def get_image_by_id(category, image_id):
+    try:
+        # Validate image_id as a proper ObjectId
+        try:
+            obj_id = ObjectId(image_id)
+        except InvalidId:
+            return {"success": False, "message": "Invalid image ID format"}
+
+        # Find the image document
+        image = collection.find_one({"image_description": category, "_id": obj_id})
+
+        if image:
+            return {"success": True, "image": image}
+        else:
+            return {"success": False, "message": "Image not found"}
+
+    except Exception as e:
+        return {"success": False, "message": f"Error retrieving image: {str(e)}"}

@@ -78,6 +78,31 @@ const AllItemsPage = () => {
     navigate('/dashboard');
   };
 
+  const handleDelete = async (itemId) => {
+  try {
+    const confirmed = window.confirm('Are you sure you want to delete this item?');
+    if (!confirmed) return;
+
+    const userId = localStorage.getItem('userId');
+    const response = await fetch(`/api/users/${userId}/items/${itemId}`, {
+      method: 'DELETE'
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      // Remove the deleted item from the state
+      setItems(prevItems => prevItems.filter(item => item._id !== itemId));
+      navigate('/dashboard');
+      alert('Item deleted successfully!');
+    } else {
+      alert('Failed to delete item.');
+    }
+  } catch (err) {
+    console.error('Error deleting item:', err);
+    alert('An error occurred while deleting.');
+  }
+};
+
   return (
     <div className="all-items">
       <header className="all-items-header">
@@ -109,6 +134,14 @@ const AllItemsPage = () => {
                   />
                 </div>
                 <div className="item-category">{item.category || item.description}</div>
+
+                {/* 🔘 Delete Button */}
+                <button
+                  className="delete-btn"
+                  onClick={() => handleDelete(item._id || index)}
+                >
+                  Delete
+                </button>
               </div>
             ))}
           </section>

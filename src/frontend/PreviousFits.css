@@ -1,11 +1,11 @@
 /* PreviousFits.css */
 @import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;700&display=swap');
 
-html, body {
+html, body, #root {
   height: 100%;
+  width: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
 }
 
 .previous-fits-container {
@@ -73,7 +73,8 @@ html, body {
 }
 
 .previous-fits-content {
-  flex: 1;
+  flex: 1 1 auto; /* Allow it to grow and shrink */
+  min-width: 0;
   padding: 40px;
   overflow-y: auto;
   margin-left: 250px; /* Match the sidebar width */

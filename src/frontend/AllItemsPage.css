@@ -191,4 +191,24 @@
     padding: 8px;
     font-size: 14px;
   }
+
+  .delete-btn {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Kantumruy Pro', sans-serif;
+  font-size: 14px;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+}
+
+.delete-btn:hover {
+  background-color: #ff1a1a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(255, 77, 77, 0.3);
+}
+
 }

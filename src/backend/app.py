@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 # Enable CORS with more specific configuration
-CORS(app, resources={r"/api/*": {"origins": "*", "methods": ["GET", "POST", "OPTIONS"], "allow_headers": ["Content-Type", "Authorization"]}})
+CORS(app, resources={r"/api/*": {"origins": "*", "methods": ["GET", "POST", "OPTIONS", "DELETE"], "allow_headers": ["Content-Type", "Authorization"]}})
 
 
 @app.route('/api/auth/login', methods=['POST'])
@@ -503,9 +503,200 @@ def crop_image():
         logger.error(f"Error in crop_image endpoint: {str(e)}")
         return jsonify({"success": False, "message": f"Error: {str(e)}"}), 500
 
+
+@app.route('/api/users/<user_id>/items/<int:image_id>', methods=['DELETE'])
+def delete_image(user_id, image_id):
+    print(f"Deleting image with image_id (index-based): {image_id}")
+    try:
+        # Get the username from the user ID
+        user_result = users.get_user_by_id(user_id)
+        if not user_result["success"]:
+            return jsonify({"error": "User not found"}), 404
+
+        username = user_result["user"]["username"]
+
+        # Step 1: Fetch the specific image by index
+        image_cursor = images.collection.find({"username": username}).sort("upload_time", 1).skip(image_id).limit(1)
+        image = list(image_cursor)
+
+        if not image:
+            return jsonify({"error": "Image not found"}), 404
+
+        image_doc = image[0]
+        imageID = image_doc["image_id"]
+        category = image_doc["image_description"]
+        outfit_num = image_doc["outfit_numbers"]
+
+        # Step 2: Delete the image
+        delete_result = images.delete_image(username,category,imageID,outfit_num)
+
+        if not delete_result:
+            return jsonify({"error": "Failed to delete image"}), 500
+
+        # Step 3: Re-index remaining images for the user
+        remaining_images = list(images.collection.find(
+            {"username": username}
+        ).sort("upload_time", 1))  # Replace with your sorting field
+
+        for new_index, doc in enumerate(remaining_images):
+            images.collection.update_one(
+                {"_id": doc["_id"]},
+                {"$set": {"image_id": str(new_index + 1)}}  # or `int` if preferred
+            )
+
+        return jsonify({"success": True, "message": "Image deleted and re-indexed successfully"}), 200
+
+    except Exception as e:
+        return jsonify({"error": f"Error deleting image: {str(e)}"}), 500
+
+
+
 @app.route('/api/test')
 def test_api():
+    return jsonify({"message": "API is working!", "status": "success"}), 200
+
+
+@app.route('/api/save-outfit', methods=['POST'])
+def save_outfit():
+    try:
+        data = request.get_json()
+        user_id = data.get('userId')
+        outfit_items = data.get('outfitItems')
+
+        if not user_id or not outfit_items or len(outfit_items) != 6:
+            return jsonify({
+                "success": False,
+                "message": "Invalid request. User ID and 6 outfit items are required."
+            }), 400
+
+        # Get the username from the user_id
+        user_result = users.get_user_by_id(user_id)
+        if not user_result["success"]:
+            return jsonify({"success": False, "message": "User not found"}), 404
+
+        username = user_result["user"]["username"]
+
+        # Extract image IDs from the outfit items
+        # The outfit array should contain items in this order: hat, shirt, jacket, shorts, pants, shoes
+        outfit_ids = []
+        for item in outfit_items:
+            # If the item is null/empty, use -1 (placeholder for empty item)
+            if not item or "id" not in item:
+                outfit_ids.append("-1")
+            else:
+                # Extract the numeric ID from the item
+                item_id = item.get("id", "-1").split("-")[-1]
+                # If it's not a valid ID, use -1
+                outfit_ids.append(item_id if item_id.isdigit() else "-1")
+
+        # Create the outfit in the database
+        outfits.create_outfit(username, outfit_ids)
+
+        return jsonify({
+            "success": True,
+            "message": "Outfit saved successfully!"
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Error saving outfit: {str(e)}")
+        return jsonify({
+            "success": False,
+            "message": f"Error saving outfit: {str(e)}"
+        }), 500
+
+
+@app.route('/api/users/<user_id>/outfits', methods=['GET'])
+def get_user_outfits(user_id):
+    try:
+        # Get the username from the user_id
+        user_result = users.get_user_by_id(user_id)
+        if not user_result["success"]:
+            return jsonify({"success": False, "message": "User not found"}), 404
+
+        username = user_result["user"]["username"]
+
+        # Use the collections from imported modules rather than direct mongo_connection
+        # Get all outfits for the user from MongoDB
+        user_outfits = []
+        outfit_docs = outfits.collection.find({"username": username})
+
+        for outfit in outfit_docs:
+            outfit_data = {
+                "outfitNumber": outfit["outfit_number"],
+                "items": []
+            }
+
+            # Get each item in the outfit
+            item_types = [
+                {"type": "hat", "id": outfit["hat_id"]},
+                {"type": "shirt", "id": outfit["shirt_id"]},
+                {"type": "jacket", "id": outfit["jacket_id"]},
+                {"type": "short", "id": outfit["short_id"]},
+                {"type": "pant", "id": outfit["pant_id"]},
+                {"type": "shoe", "id": outfit["shoe_id"]}
+            ]
+
+            # Fetch the actual image data for each item
+            for item in item_types:
+                # Skip placeholder items
+                if item["id"] == "-1":
+                    outfit_data["items"].append({
+                        "type": item["type"],
+                        "id": "-1",
+                        "base64": None
+                    })
+                    continue
+
+                if item["type"] == "short":
+                    image_doc = images.collection.find_one({
+                        "username": username,
+                        "image_description": "shorts",
+                        "image_id": item["id"]
+                    })
+                else:
+                    image_doc = images.collection.find_one({
+                        "username": username,
+                        "image_description": item["type"],
+                        "image_id": item["id"]
+                    })
+
+                if image_doc:
+                    import base64
+                    # Convert binary image data to base64 string
+                    base64_data = base64.b64encode(image_doc["image_data"]).decode('utf-8')
+                    img_src = f"data:image/png;base64,{base64_data}"
+
+                    outfit_data["items"].append({
+                        "type": item["type"],
+                        "id": item["id"],
+                        "base64": img_src
+                    })
+                else:
+                    # Item not found, use placeholder
+                    outfit_data["items"].append({
+                        "type": item["type"],
+                        "id": "-1",
+                        "base64": None
+                    })
+
+            user_outfits.append(outfit_data)
+
+        # Sort outfits by outfit number (newest first)
+        user_outfits.sort(key=lambda x: int(x["outfitNumber"]), reverse=True)
+
+        return jsonify({
+            "success": True,
+            "outfits": user_outfits
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Error getting user outfits: {str(e)}")
+        return jsonify({
+            "success": False,
+            "message": f"Error getting outfits: {str(e)}"
+        }), 500
     return jsonify({'message': 'API is working!'})
+
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5001))

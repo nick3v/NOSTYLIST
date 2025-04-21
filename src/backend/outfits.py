@@ -44,7 +44,7 @@ def create_outfit(username, outfit):
             image_description = "jacket"
             image_id = str(outfit[2])
         elif j == 3:
-            image_description = "short"
+            image_description = "shorts"
             image_id = str(outfit[3])
         elif j == 4:
             image_description = "pant"
@@ -108,7 +108,7 @@ def discard_outfit(username, outfit_num):
             image_description = "jacket"
             image_id = str(result["jacket_id"])
         elif j == 3:
-            image_description = "short"
+            image_description = "shorts"
             image_id = str(result["short_id"])
         elif j == 4:
             image_description = "pant"
@@ -150,7 +150,7 @@ def discard_outfit(username, outfit_num):
                 image_description = "jacket"
                 image_id = str(result2["jacket_id"])
             elif j == 3:
-                image_description = "short"
+                image_description = "shorts"
                 image_id = str(result2["short_id"])
             elif j == 4:
                 image_description = "pant"

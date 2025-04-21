@@ -136,7 +136,7 @@ const PreviousFits = () => {
           </div>
         )}
         
-        {/* Debug information to help with API issues */}
+        {/* Debug information to help with API issues */} {/* Commented our debug option to hide sensitive data
         <div className="debug-info">
           <div className="debug-header" onClick={() => document.querySelector('.debug-content').classList.toggle('show')}>
             Debug Info (Click to toggle)
@@ -149,7 +149,7 @@ const PreviousFits = () => {
             <p>First outfit data (if any):</p>
             <pre>{outfits.length > 0 ? JSON.stringify(outfits[0], null, 2) : 'No outfits'}</pre>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
