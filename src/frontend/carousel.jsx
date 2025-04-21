@@ -291,21 +291,42 @@ useEffect(() => {
     e.preventDefault();
     const src = e.dataTransfer.getData('src');
     
-    if (src && !outfit.includes(src)) {
-        // Find the original item to get its category
-        const draggedItem = allImages.find(item => item.src === src);
-        if (!draggedItem) return;
-        
-        // Add to outfit with category information
-        setOutfit(prev => [...prev, { src, category: draggedItem.category, id: draggedItem.id }]);
-        
-        // Remove from allImages
-        setAllImages(prev => prev.filter(item => item.src !== src));
-        
-        // Force reset carousel position and re-render the entire carousel
-        setCurrentIndex(0);
-        setCarouselKey(prev => prev + 1);
+    if (!src) return;
+    
+    console.log('Handling drop with src:', src.substring(0, 20));
+    
+    // Check if this exact image is already in the outfit
+    const isAlreadyInOutfit = outfit.some(item => {
+      return typeof item === 'string' ? item === src : item.src === src;
+    });
+    
+    if (isAlreadyInOutfit) {
+      console.log('Item is already in the outfit, ignoring drop');
+      return;
     }
+        
+    // Find the original complete item with all its properties
+    const draggedItem = allImages.find(item => item.src === src);
+    
+    if (!draggedItem) {
+      console.error('Could not find the original item in allImages');
+      return;
+    }
+    
+    console.log('Found original item:', {
+      category: draggedItem.category,
+      id: draggedItem.id
+    });
+    
+    // Add to outfit with complete original item data to preserve all properties
+    setOutfit(prev => [...prev, { ...draggedItem }]);
+    
+    // Remove from allImages
+    setAllImages(prev => prev.filter(item => item.src !== src));
+    
+    // Force reset carousel position and re-render the entire carousel
+    setCurrentIndex(0);
+    setCarouselKey(prev => prev + 1);
   };
 
   const handleDragStart = (e, src) => {
@@ -390,12 +411,21 @@ useEffect(() => {
       // If an item is missing, use null
       const outfitItems = Array(6).fill(null);
       
+      // Add debug logging
+      console.log('Saving outfit items:', JSON.stringify(outfit));
+      
       // Map each item to its correct position based on category
       outfit.forEach(item => {
-        const category = typeof item === 'string' 
-          ? null // We can't determine category from string alone
-          : item.category;
+        // Make sure we handle string items properly for backwards compatibility
+        const itemObj = typeof item === 'string' 
+          ? { src: item, category: null, id: null } // Convert string to object
+          : item;
           
+        const category = itemObj.category;
+        
+        // Debug log
+        console.log('Processing item:', itemObj.src?.substring(0, 20), 'Category:', category);
+        
         let index = -1;
         if (category === 'Hats') index = 0; // Hat
         else if (category === 'Shirts') index = 1; // Shirt
@@ -404,10 +434,16 @@ useEffect(() => {
         else if (category === 'Pants') index = 4; // Pants
         else if (category === 'Shoes') index = 5; // Shoes
         
+        console.log('Assigned index:', index, 'for category:', category);
+        
         if (index !== -1) {
-          outfitItems[index] = item;
+          // Ensure we pass the EXACT item without modifications
+          outfitItems[index] = { ...itemObj };
         }
       });
+      
+      // Log the final outfitItems to debug
+      console.log('Final outfitItems array:', outfitItems.map(item => item ? item.category : 'empty'));
       
       // Send the outfit to the backend
       const response = await fetch('/api/save-outfit', {
@@ -429,15 +465,20 @@ useEffect(() => {
         // Return all outfit items to the carousel
         const itemsToReturn = [...outfit];
         
+        // Log the items we're going to return
+        console.log('Items to return to carousel:', itemsToReturn.length);
+        
         // Clear the outfit
         setOutfit([]);
         
-        // Return items to carousel one by one
-        itemsToReturn.forEach(item => {
-          const { src, category } = typeof item === 'string' 
-            ? { src: item, category: null } 
+        // Return items to carousel one by one with guaranteed unique IDs
+        itemsToReturn.forEach((item, index) => {
+          const itemObj = typeof item === 'string' 
+            ? { src: item, category: null, id: null } 
             : item;
             
+          const { src, category } = itemObj;
+          
           let categoryToUse = category;
           
           if (!categoryToUse) {
@@ -450,17 +491,20 @@ useEffect(() => {
                           'Pants';
           }
           
-          // Add item back to allImages
+          console.log(`Returning item ${index} to carousel: Category=${categoryToUse}, src=${src?.substring(0, 20)}`);
+          
+          // Add item back to allImages with a unique timestamp to prevent duplicates
           const newItem = { 
             src, 
             category: categoryToUse, 
-            id: `returned-${Date.now()}-${Math.random().toString(36).substring(2, 9)}` 
+            id: `returned-${Date.now() + index}-${Math.random().toString(36).substring(2, 9)}` 
           };
           
+          // Always add at the beginning of the array to make it the latest item
           setAllImages(prev => [newItem, ...prev]);
         });
         
-        // Reset carousel position
+        // Reset carousel position to show the newest returned item
         setCurrentIndex(0);
         setCarouselKey(prev => prev + 1);
         

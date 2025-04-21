@@ -54,6 +54,7 @@ const PreviousFits = () => {
       shirt: '👕',
       jacket: '🧥',
       short: '🩳',
+      shorts: '🩳',
       pant: '👖',
       shoe: '👟'
     };

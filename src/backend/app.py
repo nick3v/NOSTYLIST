@@ -362,7 +362,7 @@ def crop_image():
 
         try:
             # SPECIAL CASE FOR SHORTS: Skip cropping and directly save the original image
-            if category in ['shorts', 'shoe', 'jacket', 'pant', 'hat']:
+            if category in ['shorts', 'shoe', 'jacket', 'pant', 'hat', 'shirt']:
                 logger.info(f"Processing {category}: bypassing cropping process")
                 
                 # Just load and convert the image to RGBA
@@ -549,6 +549,8 @@ def save_outfit():
         user_id = data.get('userId')
         outfit_items = data.get('outfitItems')
         
+        logger.info(f"Saving outfit for user_id: {user_id}, item count: {len(outfit_items) if outfit_items else 0}")
+        
         if not user_id or not outfit_items or len(outfit_items) != 6:
             return jsonify({
                 "success": False,
@@ -561,19 +563,61 @@ def save_outfit():
             return jsonify({"success": False, "message": "User not found"}), 404
             
         username = user_result["user"]["username"]
+        logger.info(f"Found username: {username} for user_id: {user_id}")
         
         # Extract image IDs from the outfit items
         # The outfit array should contain items in this order: hat, shirt, jacket, shorts, pants, shoes
         outfit_ids = []
-        for item in outfit_items:
+        for i, item in enumerate(outfit_items):
+            # Debug info to trace the issue
+            item_category = item.get("category", "unknown") if item else "null"
+            logger.info(f"Processing outfit item {i}: {item_category}")
+            
             # If the item is null/empty, use -1 (placeholder for empty item)
-            if not item or "id" not in item:
+            if not item:
                 outfit_ids.append("-1")
-            else:
-                # Extract the numeric ID from the item
-                item_id = item.get("id", "-1").split("-")[-1]
-                # If it's not a valid ID, use -1
-                outfit_ids.append(item_id if item_id.isdigit() else "-1")
+                logger.info(f"Item {i} is null, using placeholder -1")
+                continue
+                
+            if "id" not in item:
+                outfit_ids.append("-1")
+                logger.info(f"Item {i} has no ID, using placeholder -1")
+                continue
+                
+            # Get the ID string
+            item_id_str = str(item.get("id", "-1"))
+            logger.info(f"Raw item ID for {i}: {item_id_str}")
+            
+            # Try different ID extraction methods
+            
+            # First check if it's a database ID (pure number)
+            if item_id_str.isdigit():
+                outfit_ids.append(item_id_str)
+                logger.info(f"Using numeric ID for item {i}: {item_id_str}")
+                continue
+                
+            # Next try extracting ID from different formats
+            # 1. Try to extract from "returned-timestamp-randomid" format
+            if "returned-" in item_id_str:
+                parts = item_id_str.split("-")
+                if len(parts) >= 3 and parts[-1].isalnum():
+                    outfit_ids.append(parts[-1])
+                    logger.info(f"Extracted ID from returned format for item {i}: {parts[-1]}")
+                    continue
+            
+            # 2. Try general hyphen extraction approach
+            parts = item_id_str.split("-")
+            if len(parts) > 0 and parts[-1].isalnum():
+                outfit_ids.append(parts[-1])
+                logger.info(f"Extracted ID from general split for item {i}: {parts[-1]}")
+                continue
+                
+            # Fallback to -1 if we couldn't parse the ID
+            outfit_ids.append("-1")
+            logger.info(f"Could not extract valid ID for item {i}, using placeholder -1")
+        
+        # Log the final outfit IDs
+        logger.info(f"Final outfit IDs: {outfit_ids}")
         
         # Create the outfit in the database
         outfits.create_outfit(username, outfit_ids)
@@ -632,11 +676,29 @@ def get_user_outfits(user_id):
                     })
                     continue
                 
-                image_doc = images.collection.find_one({
-                    "username": username, 
-                    "image_description": item["type"], 
-                    "image_id": item["id"]
-                })
+                # Fix for shorts - try both "short" and "shorts" as image_description
+                if item["type"] == "short":
+                    # First try with "shorts"
+                    image_doc = images.collection.find_one({
+                        "username": username, 
+                        "image_description": "shorts", 
+                        "image_id": item["id"]
+                    })
+                    
+                    # If not found, try with "short"
+                    if not image_doc:
+                        image_doc = images.collection.find_one({
+                            "username": username, 
+                            "image_description": "short", 
+                            "image_id": item["id"]
+                        })
+                else:
+                    # For other item types, use regular search
+                    image_doc = images.collection.find_one({
+                        "username": username, 
+                        "image_description": item["type"], 
+                        "image_id": item["id"]
+                    })
                 
                 if image_doc:
                     import base64
