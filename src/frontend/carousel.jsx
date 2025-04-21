@@ -291,42 +291,36 @@ useEffect(() => {
     e.preventDefault();
     const src = e.dataTransfer.getData('src');
     
-    if (!src) return;
-    
-    console.log('Handling drop with src:', src.substring(0, 20));
-    
-    // Check if this exact image is already in the outfit
-    const isAlreadyInOutfit = outfit.some(item => {
-      return typeof item === 'string' ? item === src : item.src === src;
-    });
-    
-    if (isAlreadyInOutfit) {
-      console.log('Item is already in the outfit, ignoring drop');
-      return;
-    }
+    if (src) {
+        // Find the original item to get its category
+        const draggedItem = allImages.find(item => item.src === src);
+        if (!draggedItem) return;
         
-    // Find the original complete item with all its properties
-    const draggedItem = allImages.find(item => item.src === src);
-    
-    if (!draggedItem) {
-      console.error('Could not find the original item in allImages');
-      return;
+        // Check if the outfit already has an item of the same category
+        const categoryExists = outfit.some(item => {
+            const itemCategory = typeof item === 'string' 
+                ? null // Can't determine from string
+                : item.category;
+            return itemCategory === draggedItem.category;
+        });
+        
+        // Only add if this category doesn't already exist in the outfit
+        if (!categoryExists) {
+            // Add to outfit with category information
+            setOutfit(prev => [...prev, { src, category: draggedItem.category, id: draggedItem.id }]);
+            
+            // Remove from allImages
+            setAllImages(prev => prev.filter(item => item.src !== src));
+            
+            // Force reset carousel position and re-render the entire carousel
+            setCurrentIndex(0);
+            setCarouselKey(prev => prev + 1);
+        } else {
+            // Optionally provide visual feedback that duplicate categories aren't allowed
+            setSaveMessage('Only one item per category allowed in a fit');
+            setTimeout(() => setSaveMessage(''), 3000);
+        }
     }
-    
-    console.log('Found original item:', {
-      category: draggedItem.category,
-      id: draggedItem.id
-    });
-    
-    // Add to outfit with complete original item data to preserve all properties
-    setOutfit(prev => [...prev, { ...draggedItem }]);
-    
-    // Remove from allImages
-    setAllImages(prev => prev.filter(item => item.src !== src));
-    
-    // Force reset carousel position and re-render the entire carousel
-    setCurrentIndex(0);
-    setCarouselKey(prev => prev + 1);
   };
 
   const handleDragStart = (e, src) => {
