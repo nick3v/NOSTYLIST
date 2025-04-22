@@ -1,10 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import LoginFeature from './loginfeature';
-import SignupFeature from './signupfeature';
-import Dashboard from './dashboard'; // ✅ Import Dashboard
-import { AudioProvider } from './AudioContext';
+import LoginFeature from './loginfeature.jsx';
+import SignupFeature from './signupfeature.jsx';
+import Dashboard from './dashboard.jsx';
+import UploadImage from './UploadImage.jsx';
+import AllItemsPage from './AllItemsPage.jsx';
+import PreviousFits from './PreviousFits.jsx';
+import TestPage from './TestPage.jsx';
+import { AudioProvider } from './AudioContext.jsx';
 import './loginfeature.css';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -17,7 +21,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         <Routes>
                             <Route path="/" element={<LoginFeature />} />
                             <Route path="/signup" element={<SignupFeature />} />
-                            <Route path="/dashboard" element={<Dashboard />} /> {/* ✅ New route */}
+                            <Route path="/dashboard" element={<Dashboard />} />
+                            <Route path="/upload-image" element={<UploadImage />} />
+                            <Route path="/all-items" element={<AllItemsPage />} />
+                            <Route path="/previous-fits" element={<PreviousFits />} />
+                            <Route path="/test" element={<TestPage />} />
                         </Routes>
                     </BrowserRouter>
                 </AudioProvider>

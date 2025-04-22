@@ -10,19 +10,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f4ae9df2-c745-4a3e-a51a-8328e99b0411" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/public/carti hat.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/rick boots.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/shirt.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/AllItemsPage.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/AllItemsPage.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/App.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/carousel.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/carousel.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/carousel.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/carousel.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/dashboard.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/dashboard.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/dashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/dashboard.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/images.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/images.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/backend/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/backend/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/backend/images.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/backend/images.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/backend/outfits.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/backend/outfits.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/frontend/AllItemsPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/frontend/AllItemsPage.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/frontend/AllItemsPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/frontend/AllItemsPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/frontend/PreviousFits.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/frontend/PreviousFits.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/frontend/PreviousFits.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/frontend/PreviousFits.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,6 +39,7 @@
         <option value="HTML File" />
         <option value="JavaScript File" />
         <option value="package.json" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
@@ -61,6 +60,9 @@
 }</component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="ProjectErrors" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
@@ -85,7 +87,7 @@
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feature/Carousel&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;crop-integration&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/marco/PycharmProjects/NOSTYLIST/public&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,

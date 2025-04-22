@@ -6,6 +6,7 @@ from bson.objectid import ObjectId
 # The collection name "users" will store all user data from the login page into the NOSTYLIST database
 collection = mongo_connection.db["users"]
 
+
 def create_user(username, email, password):
     """
     Create a new user in the database
@@ -21,14 +22,14 @@ def create_user(username, email, password):
     # Validate input data
     if not username or not email or not password:
         return {"success": False, "message": "All fields are required"}
-    
+
     # Check if username or email already exists
     if collection.find_one({"$or": [{"username": username}, {"email": email}]}):
         return {"success": False, "message": "Username or email already exists"}
-    
+
     # Hash the password for security
     hashed_password = pbkdf2_sha256.hash(password)
-    
+
     # Create user document
     new_user = {
         "username": username,
@@ -38,20 +39,23 @@ def create_user(username, email, password):
         "num_outfits": "0",
         "num_hats": "0",
         "num_shirts": "0",
+        "num_jackets": "0",
+        "num_shorts": "0",
         "num_pants": "0",
-        "num_shoes": "0" # need to come back here if we add more accessories
+        "num_shoes": "0"  # need to come back here if we add more accessories
     }
-    
+
     try:
         # Insert user into database
         result = collection.insert_one(new_user)
         return {
-            "success": True, 
+            "success": True,
             "user_id": str(result.inserted_id),
             "message": "User created successfully"
         }
     except Exception as e:
         return {"success": False, "message": f"Error creating user: {str(e)}"}
+
 
 # Insert data as a dictionary (map) into Mongo:
 
@@ -87,21 +91,21 @@ def authenticate_user(username, password):
     """
     # Example usage:
     # result = authenticate_user("JordanCarter29", "I_AM_NOT_DROPPING")
-    
+
     # print(result)
     # Validate input data
     if not username or not password:
         return {"success": False, "message": "Username and password are required"}
-    
+
     # Find user by username
     user = collection.find_one({"username": username})
-    
+
     # Check if user exists and password is correct using secure hash verification
     if user and pbkdf2_sha256.verify(password, user["password"]):
         # Return the MongoDB document ID to identify this specific user
         # This ID can be used to look up user data or manage sessions
         return {"success": True, "user_id": str(user["_id"])}
-    
+
     return {"success": False, "message": "Invalid username or password"}
 
 
@@ -121,14 +125,63 @@ def get_user_by_id(user_id):
     try:
         # Find user by ID
         user = collection.find_one({"_id": ObjectId(user_id)})
-        
+
         if user:
             return {"success": True, "user": user}
         else:
             return {"success": False, "message": "User not found"}
     except Exception as e:
-        return {"success": False, "message": f"Error retrieving user: {str(e)}"} 
+        return {"success": False, "message": f"Error retrieving user: {str(e)}"}
 
-    # Example usage:
+        # Example usage:
     # result = get_user_by_id("66d563e1e5b58d4a8b75a33d")
     # print(JordanCarter29)
+
+# Add a migration function to ensure all users have the required fields
+def ensure_user_fields():
+    """
+    Ensures all user documents in the database have all required fields.
+    This is especially important after schema changes.
+    """
+    try:
+        # Fields that should be present in every user document with default values
+        required_fields = {
+            "num_outfits": "0",
+            "num_hats": "0",
+            "num_shirts": "0",
+            "num_jackets": "0",
+            "num_shorts": "0",  # This field was missing
+            "num_pants": "0",
+            "num_shoes": "0"
+        }
+        
+        # Get all users
+        users = collection.find({})
+        update_count = 0
+        
+        for user in users:
+            update_needed = False
+            updates = {}
+            
+            # Check if each required field exists
+            for field, default_value in required_fields.items():
+                if field not in user:
+                    updates[field] = default_value
+                    update_needed = True
+            
+            # Update the user if needed
+            if update_needed:
+                collection.update_one(
+                    {"_id": user["_id"]},
+                    {"$set": updates}
+                )
+                update_count += 1
+        
+        print(f"Updated {update_count} user(s) with missing fields")
+        return {"success": True, "updated_count": update_count}
+    except Exception as e:
+        print(f"Error in ensure_user_fields: {str(e)}")
+        return {"success": False, "message": str(e)}
+
+# Run the migration function when this module is imported
+ensure_user_fields()
