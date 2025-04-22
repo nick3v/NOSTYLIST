@@ -441,6 +441,21 @@ def crop_image():
                     offset_y = (mask.height - smaller_height) // 2
                     larger_mask.paste(smaller_mask, (offset_x, offset_y))
                     mask = larger_mask
+                elif category == 'jacket':
+                    # Do the regular center flood fill first
+                    center_x, center_y = outline.width // 2, outline.height // 2
+                    flood_fill(mask, center_x, center_y)
+
+                    # Add additional flood fill points inside each sleeve
+                    # Left sleeve (approximate coordinates)
+                    left_sleeve_x = outline.width * 0.2
+                    left_sleeve_y = outline.height * 0.4
+                    flood_fill(mask, int(left_sleeve_x), int(left_sleeve_y))
+
+                    # Right sleeve (approximate coordinates)
+                    right_sleeve_x = outline.width * 0.8
+                    right_sleeve_y = outline.height * 0.4
+                    flood_fill(mask, int(right_sleeve_x), int(right_sleeve_y))
                 else:
                     # For all other items, use center fill as before
                     center_x, center_y = outline.width // 2, outline.height // 2
