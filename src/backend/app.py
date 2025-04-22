@@ -419,9 +419,32 @@ def crop_image():
                         if pixel[3] > 128 and sum(pixel[:3]) / 3 < 128:
                             mask.putpixel((x, y), 255)  # White in mask = area to keep
 
-                # Fill the inside of the outline using flood fill
-                center_x, center_y = outline.width // 2, outline.height // 2
-                flood_fill(mask, center_x, center_y)
+                if category == 'pant':
+                    # Fill from corners (outside area)
+                    flood_fill(mask, 0, 0)
+                    flood_fill(mask, outline.width - 1, 0)
+                    flood_fill(mask, 0, outline.height - 1)
+                    flood_fill(mask, outline.width - 1, outline.height - 1)
+
+                    # Invert the mask
+                    for y in range(mask.height):
+                        for x in range(mask.width):
+                            mask.putpixel((x, y), 255 - mask.getpixel((x, y)))
+
+                    # Make pants 50% larger
+                    larger_mask = Image.new("L", mask.size, 0)
+                    scale_factor = 1.5  # 1/1.5 to make result 50% larger
+                    smaller_width = int(mask.width * scale_factor)
+                    smaller_height = int(mask.height * scale_factor)
+                    smaller_mask = mask.resize((smaller_width, smaller_height), Image.LANCZOS)
+                    offset_x = (mask.width - smaller_width) // 2
+                    offset_y = (mask.height - smaller_height) // 2
+                    larger_mask.paste(smaller_mask, (offset_x, offset_y))
+                    mask = larger_mask
+                else:
+                    # For all other items, use center fill as before
+                    center_x, center_y = outline.width // 2, outline.height // 2
+                    flood_fill(mask, center_x, center_y)
 
                 # Calculate scaling to fit within canvas
                 max_width = canvas_width * 0.8
