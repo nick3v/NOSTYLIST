@@ -734,6 +734,51 @@ def get_user_outfits(user_id):
     return jsonify({'message': 'API is working!'})
 
 
+@app.route('/api/users/<user_id>/outfits/<outfit_num>', methods=['DELETE'])
+def delete_user_outfit(user_id, outfit_num):
+    try:
+        # Get the username from the user_id
+        user_result = users.get_user_by_id(user_id)
+        if not user_result["success"]:
+            return jsonify({"success": False, "message": "User not found"}), 404
+
+        # Extract username from the user object in the result
+        username = user_result["user"]["username"]
+        
+        # Check if the outfit exists first
+        outfit_exists = outfits.collection.find_one({"username": username, "outfit_number": outfit_num})
+        if not outfit_exists:
+            return jsonify({"success": False, "message": "Outfit not found"}), 404
+        
+        try:
+            # Delete the outfit but keep the items
+            result = outfits.discard_outfit(username, outfit_num)
+            
+            return jsonify({
+                "success": True,
+                "message": "Outfit deleted successfully"
+            }), 200
+        except Exception as e:
+            logger.error(f"Error in discard_outfit function: {str(e)}")
+            # Alternative approach: manually delete the outfit record if the discard_outfit function fails
+            try:
+                outfits.collection.delete_one({"username": username, "outfit_number": outfit_num})
+                return jsonify({
+                    "success": True,
+                    "message": "Outfit deleted (simple method)"
+                }), 200
+            except Exception as inner_e:
+                logger.error(f"Error in fallback delete: {str(inner_e)}")
+                return jsonify({"success": False, "message": f"Failed to delete outfit: {str(inner_e)}"}), 500
+        
+    except Exception as e:
+        logger.error(f"Error deleting outfit: {str(e)}")
+        return jsonify({
+            "success": False,
+            "message": f"Error deleting outfit: {str(e)}"
+        }), 500
+
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5001))
     app.run(host='0.0.0.0', port=port, debug=True)
