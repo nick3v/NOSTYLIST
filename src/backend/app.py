@@ -159,7 +159,8 @@ def upload_image():
                 img = img.convert('RGBA')
 
             # Load the appropriate outline image
-            outline_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'public', f'{category}.png')
+            outline_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 
+                                   "public", f'{category}.png')
 
             # If outline exists, use it for masking
             if os.path.exists(outline_path):
@@ -402,7 +403,7 @@ def crop_image():
                 outline_filename = 'shortsOutline.png'
 
             # Use the correct path to the public directory
-            outline_path = os.path.join((os.getenv("HOME") or os.getenv("USERPROFILE")), "PycharmProjects", "NOSTYLIST",
+            outline_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 
                                    "public", outline_filename)
 
             if os.path.exists(outline_path):
@@ -542,9 +543,9 @@ def crop_image():
         return jsonify({"success": False, "message": f"Error: {str(e)}"}), 500
 
 
-@app.route('/api/users/<user_id>/items/<int:image_id>', methods=['DELETE'])
-def delete_image(user_id, image_id):
-    print(f"Deleting image with image_id (index-based): {image_id}")
+@app.route('/api/users/<user_id>/items/<path:item_id>', methods=['DELETE'])
+def delete_image(user_id, item_id):
+    print(f"Deleting image with item_id: {item_id}")
     try:
         # Get the username from the user ID
         user_result = users.get_user_by_id(user_id)
@@ -553,36 +554,33 @@ def delete_image(user_id, image_id):
 
         username = user_result["user"]["username"]
 
-        # Step 1: Fetch the specific image by index
-        image_cursor = images.collection.find({"username": username}).sort("upload_time", 1).skip(image_id).limit(1)
-        image = list(image_cursor)
+        # Extract category and image_id from the item_id
+        parts = item_id.split('/')
+        if len(parts) != 2:
+            return jsonify({"error": "Invalid item ID format"}), 400
+            
+        category = parts[0]
+        image_id = parts[1]
 
-        if not image:
+        # Find the specific image
+        image_doc = images.collection.find_one({
+            "username": username, 
+            "image_description": category, 
+            "image_id": image_id
+        })
+
+        if not image_doc:
             return jsonify({"error": "Image not found"}), 404
 
-        image_doc = image[0]
-        imageID = image_doc["image_id"]
-        category = image_doc["image_description"]
         outfit_num = image_doc["outfit_numbers"]
 
-        # Step 2: Delete the image
-        delete_result = images.delete_image(username,category,imageID,outfit_num)
+        # Delete the image
+        delete_result = images.delete_image(username, category, image_id, outfit_num)
 
         if not delete_result:
             return jsonify({"error": "Failed to delete image"}), 500
 
-        # Step 3: Re-index remaining images for the user
-        remaining_images = list(images.collection.find(
-            {"username": username}
-        ).sort("upload_time", 1))  # Replace with your sorting field
-
-        for new_index, doc in enumerate(remaining_images):
-            images.collection.update_one(
-                {"_id": doc["_id"]},
-                {"$set": {"image_id": str(new_index + 1)}}  # or `int` if preferred
-            )
-
-        return jsonify({"success": True, "message": "Image deleted and re-indexed successfully"}), 200
+        return jsonify({"success": True, "message": "Image deleted successfully"}), 200
 
     except Exception as e:
         return jsonify({"error": f"Error deleting image: {str(e)}"}), 500

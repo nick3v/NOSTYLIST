@@ -78,30 +78,31 @@ const AllItemsPage = () => {
     navigate('/dashboard');
   };
 
-  const handleDelete = async (itemId) => {
-  try {
-    const confirmed = window.confirm('Are you sure you want to delete this item?');
-    if (!confirmed) return;
+  const handleDelete = async (item) => {
+    try {
+      const confirmed = window.confirm('Are you sure you want to delete this item?');
+      if (!confirmed) return;
 
-    const userId = localStorage.getItem('userId');
-    const response = await fetch(`/api/users/${userId}/items/${itemId}`, {
-      method: 'DELETE'
-    });
+      const userId = localStorage.getItem('userId');
+      // Use item.category and item.id for proper identification
+      const response = await fetch(`/api/users/${userId}/items/${item.category}/${item.id}`, {
+        method: 'DELETE'
+      });
 
-    const data = await response.json();
-    if (data.success) {
-      // Remove the deleted item from the state
-      setItems(prevItems => prevItems.filter(item => item._id !== itemId));
-      navigate('/dashboard');
-      alert('Item deleted successfully!');
-    } else {
-      alert('Failed to delete item.');
+      const data = await response.json();
+      if (data.success) {
+        // Remove the deleted item from the state using its unique properties
+        setItems(prevItems => prevItems.filter(i => !(i.category === item.category && i.id === item.id)));
+        navigate('/dashboard');
+        alert('Item deleted successfully!');
+      } else {
+        alert('Failed to delete item.');
+      }
+    } catch (err) {
+      console.error('Error deleting item:', err);
+      alert('An error occurred while deleting.');
     }
-  } catch (err) {
-    console.error('Error deleting item:', err);
-    alert('An error occurred while deleting.');
-  }
-};
+  };
 
   return (
     <div className="all-items">
@@ -138,7 +139,7 @@ const AllItemsPage = () => {
                 {/* 🔘 Delete Button */}
                 <button
                   className="delete-btn"
-                  onClick={() => handleDelete(item._id || index)}
+                  onClick={() => handleDelete(item)}
                 >
                   Delete
                 </button>
