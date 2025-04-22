@@ -95,6 +95,8 @@ def get_outfit(username, outfit_num):
 def discard_outfit(username, outfit_num):
     # Get all image and outfit ids
     result = collection.find_one({"username": username, "outfit_number": outfit_num})
+    if not result:
+        raise ValueError(f"Outfit with number {outfit_num} not found for user {username}")
 
     # Update deleted outfit numbers in image collection
     for j in range(0, 6):
@@ -116,12 +118,22 @@ def discard_outfit(username, outfit_num):
         else:
             image_description = "shoe"
             image_id = str(result["shoe_id"])
+            
+        # Skip placeholder images (id -1)
+        if image_id == "-1":
+            continue
+            
         result3 = image_collection.find_one({"username": username, "image_description": image_description,
                                              "image_id": image_id})
+        # Skip if the image doesn't exist in the database
+        if not result3:
+            continue
+            
         outfit_nums = result3["outfit_numbers"]
-        outfit_nums.remove(outfit_num)  # Take out the discarded outfit number
-        image_collection.update_one({"username": username, "image_description": image_description,
-                                     "image_id": image_id}, {"$set": {"outfit_numbers": outfit_nums}})
+        if outfit_num in outfit_nums:
+            outfit_nums.remove(outfit_num)  # Take out the discarded outfit number
+            image_collection.update_one({"username": username, "image_description": image_description,
+                                        "image_id": image_id}, {"$set": {"outfit_numbers": outfit_nums}})
 
     # Delete outfit entry
     collection.delete_one({"username": username, "outfit_number": outfit_num})
@@ -133,6 +145,9 @@ def discard_outfit(username, outfit_num):
     for i in range(int(outfit_num) + 1, num_outfits + 1):
         string_num2 = str(i)
         result2 = collection.find_one({"username": username, "outfit_number": string_num2})
+        if not result2:
+            continue
+            
         num = i - 1
         string_num = str(num)
         collection.update_one({"username": username, "outfit_number": string_num2},
@@ -158,13 +173,23 @@ def discard_outfit(username, outfit_num):
             else:
                 image_description = "shoe"
                 image_id = str(result2["shoe_id"])
+                
+            # Skip placeholder images
+            if image_id == "-1":
+                continue
+                
             result3 = image_collection.find_one({"username": username, "image_description": image_description,
                                                  "image_id": image_id})
+            # Skip if the image doesn't exist
+            if not result3:
+                continue
+                
             outfit_nums = result3["outfit_numbers"]
-            index = outfit_nums.index(string_num2)
-            outfit_nums[index] = string_num
-            image_collection.update_one({"username": username, "image_description": image_description,
-                                         "image_id": image_id}, {"$set": {"outfit_numbers": outfit_nums}})
+            if string_num2 in outfit_nums:
+                index = outfit_nums.index(string_num2)
+                outfit_nums[index] = string_num
+                image_collection.update_one({"username": username, "image_description": image_description,
+                                            "image_id": image_id}, {"$set": {"outfit_numbers": outfit_nums}})
 
     # Decrement number of outfits in user collection
     num_outfits -= 1

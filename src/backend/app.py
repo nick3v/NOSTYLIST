@@ -760,16 +760,7 @@ def delete_user_outfit(user_id, outfit_num):
             }), 200
         except Exception as e:
             logger.error(f"Error in discard_outfit function: {str(e)}")
-            # Alternative approach: manually delete the outfit record if the discard_outfit function fails
-            try:
-                outfits.collection.delete_one({"username": username, "outfit_number": outfit_num})
-                return jsonify({
-                    "success": True,
-                    "message": "Outfit deleted (simple method)"
-                }), 200
-            except Exception as inner_e:
-                logger.error(f"Error in fallback delete: {str(inner_e)}")
-                return jsonify({"success": False, "message": f"Failed to delete outfit: {str(inner_e)}"}), 500
+            return jsonify({"success": False, "message": f"Failed to delete outfit: {str(e)}"}), 500
         
     except Exception as e:
         logger.error(f"Error deleting outfit: {str(e)}")
