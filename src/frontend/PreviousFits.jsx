@@ -6,46 +6,91 @@ const PreviousFits = () => {
   const [outfits, setOutfits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchOutfits = async () => {
-      setLoading(true);
-      try {
-        // Get user ID from localStorage
-        const userId = localStorage.getItem('userId');
-        
-        if (!userId) {
-          throw new Error('User not authenticated');
-        }
-        
-        console.log('Fetching outfits for user ID:', userId);
-        const response = await fetch(`/api/users/${userId}/outfits`);
-        
-        if (!response.ok) {
-          throw new Error(`Server responded with status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log('API response:', data);
-        
-        if (data.success && data.outfits && data.outfits.length > 0) {
-          setOutfits(data.outfits);
-          console.log(`Loaded ${data.outfits.length} outfits`);
-        } else {
-          console.log('No outfits found');
-          setOutfits([]);
-        }
-      } catch (err) {
-        console.error('Error fetching outfits:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
     fetchOutfits();
   }, []);
+  
+  const fetchOutfits = async () => {
+    setLoading(true);
+    try {
+      // Get user ID from localStorage
+      const userId = localStorage.getItem('userId');
+      
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+      
+      console.log('Fetching outfits for user ID:', userId);
+      const response = await fetch(`/api/users/${userId}/outfits`);
+      
+      if (!response.ok) {
+        throw new Error(`Server responded with status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('API response:', data);
+      
+      if (data.success && data.outfits && data.outfits.length > 0) {
+        setOutfits(data.outfits);
+        console.log(`Loaded ${data.outfits.length} outfits`);
+      } else {
+        console.log('No outfits found');
+        setOutfits([]);
+      }
+    } catch (err) {
+      console.error('Error fetching outfits:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteOutfit = async (outfitNumber) => {
+    if (!confirm('Are you sure you want to delete this outfit? The individual items will still be available.')) {
+      return;
+    }
+    
+    setIsDeleting(true);
+    try {
+      const userId = localStorage.getItem('userId');
+      
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+      
+      console.log(`Deleting outfit #${outfitNumber}`);
+      const response = await fetch(`/api/users/${userId}/outfits/${outfitNumber}`, {
+        method: 'DELETE',
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || `Failed to delete outfit: ${response.status}`);
+      }
+      
+      console.log('Delete response:', data);
+      
+      // Update the UI by removing the outfit locally for a faster UI response
+      setOutfits(currentOutfits => 
+        currentOutfits.filter(outfit => outfit.outfitNumber !== outfitNumber)
+      );
+      
+      // Also refresh from server to ensure sync
+      await fetchOutfits();
+      
+    } catch (err) {
+      console.error('Error deleting outfit:', err);
+      setError(`Failed to delete outfit: ${err.message}`);
+      // Show error for 3 seconds then clear it
+      setTimeout(() => setError(null), 3000);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   // Handle placeholder display for item types
   const renderPlaceholder = (type) => {
@@ -128,8 +173,13 @@ const PreviousFits = () => {
                 </div>
                 
                 <div className="outfit-actions">
-                  <button className="view-outfit-button">View Details</button>
-                  <button className="use-outfit-button">Use This Fit</button>
+                  <button 
+                    className="delete-outfit-button" 
+                    onClick={() => handleDeleteOutfit(outfit.outfitNumber)}
+                    disabled={isDeleting}
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             ))}

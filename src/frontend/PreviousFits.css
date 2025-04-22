@@ -289,7 +289,8 @@ html, body, #root {
 }
 
 .view-outfit-button,
-.use-outfit-button {
+.use-outfit-button,
+.delete-outfit-button {
   flex: 1;
   padding: 10px;
   border-radius: 8px;
@@ -318,6 +319,23 @@ html, body, #root {
 .use-outfit-button:hover {
   background: #f0f0f0;
   transform: translateY(-2px);
+}
+
+.delete-outfit-button {
+  background: rgba(255, 0, 0, 0.7);
+  color: white;
+  font-weight: 500;
+}
+
+.delete-outfit-button:hover {
+  background: rgba(255, 0, 0, 0.9);
+  transform: translateY(-2px);
+}
+
+.delete-outfit-button:disabled {
+  background: rgba(255, 0, 0, 0.3);
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* Debug panel styles */

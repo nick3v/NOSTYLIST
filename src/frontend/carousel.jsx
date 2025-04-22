@@ -291,20 +291,35 @@ useEffect(() => {
     e.preventDefault();
     const src = e.dataTransfer.getData('src');
     
-    if (src && !outfit.includes(src)) {
+    if (src) {
         // Find the original item to get its category
         const draggedItem = allImages.find(item => item.src === src);
         if (!draggedItem) return;
         
-        // Add to outfit with category information
-        setOutfit(prev => [...prev, { src, category: draggedItem.category, id: draggedItem.id }]);
+        // Check if the outfit already has an item of the same category
+        const categoryExists = outfit.some(item => {
+            const itemCategory = typeof item === 'string' 
+                ? null // Can't determine from string
+                : item.category;
+            return itemCategory === draggedItem.category;
+        });
         
-        // Remove from allImages
-        setAllImages(prev => prev.filter(item => item.src !== src));
-        
-        // Force reset carousel position and re-render the entire carousel
-        setCurrentIndex(0);
-        setCarouselKey(prev => prev + 1);
+        // Only add if this category doesn't already exist in the outfit
+        if (!categoryExists) {
+            // Add to outfit with category information
+            setOutfit(prev => [...prev, { src, category: draggedItem.category, id: draggedItem.id }]);
+            
+            // Remove from allImages
+            setAllImages(prev => prev.filter(item => item.src !== src));
+            
+            // Force reset carousel position and re-render the entire carousel
+            setCurrentIndex(0);
+            setCarouselKey(prev => prev + 1);
+        } else {
+            // Optionally provide visual feedback that duplicate categories aren't allowed
+            setSaveMessage('Only one item per category allowed in a fit');
+            setTimeout(() => setSaveMessage(''), 3000);
+        }
     }
   };
 
